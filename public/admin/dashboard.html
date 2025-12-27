@@ -126,6 +126,21 @@
     </div>
 
     <script>
+          // --- بررسی امنیت (Auth Check) ---
+     const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+
+     if (isLoggedIn !== 'true') {
+        // اگر لاگین نکرده بود، بفرستش صفحه لاگین
+        window.location.href = "login.html";
+     }
+
+     // دکمه خروج را هم اینطوری تنظیم کنید:
+     document.getElementById('logoutBtn').addEventListener('click', () => {
+        if(confirm('آیا می‌خواهید خارج شوید؟')) {
+            localStorage.removeItem('isAdminLoggedIn'); // حذف مجوز
+            window.location.href = 'login.html';
+        }
+     });
         // ۱. تابع تغییر تب‌ها
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
