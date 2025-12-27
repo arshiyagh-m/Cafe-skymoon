@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { Pool } = require('pg'); // درایور پستگرس
 const cors = require('cors');
 const path = require('path');
 const app = express();
@@ -7,84 +7,104 @@ const app = express();
 // --- تنظیمات اولیه ---
 app.use(express.json());
 app.use(cors());
-// سرو کردن فایل‌های استاتیک (HTML, CSS, JS) از پوشه public
 app.use(express.static('public'));
 
-// --- اتصال به دیتابیس (MongoDB) ---
-// در لوکال هاست از آدرس پیش‌فرض استفاده می‌کند، در لیارا از متغیر محیطی
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/skymoon';
+// --- اتصال به دیتابیس PostgreSQL ---
+// نکته: در لیارا متغیر محیطی DATABASE_URL را تنظیم کنید.
+const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/skymoon';
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ Could not connect to MongoDB:', err));
+const pool = new Pool({
+  connectionString: connectionString,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false // SSL برای لیارا ضروری است
+});
+
+// --- ایجاد جدول‌ها (اگر وجود نداشته باشند) ---
+const initDB = async () => {
+    try {
+        const client = await pool.connect();
+        
+        // 1. جدول منو
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS menu (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                category TEXT NOT NULL,
+                price NUMERIC NOT NULL,
+                description TEXT,
+                image TEXT
+            );
+        `);
+
+        // 2. جدول گالری
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS gallery (
+                id SERIAL PRIMARY KEY,
+                image TEXT NOT NULL,
+                caption TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // 3. جدول رزرو
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS reservations (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                date TEXT NOT NULL,
+                time TEXT NOT NULL,
+                guests TEXT NOT NULL,
+                space TEXT,
+                occasion TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // 4. جدول تنظیمات
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value JSONB
+            );
+        `);
+
+        console.log('✅ PostgreSQL Tables checked/created successfully');
+        client.release();
+    } catch (err) {
+        console.error('❌ Error initializing database:', err);
+    }
+};
+
+// اجرای تابع ساخت جدول‌ها در لحظه شروع
+initDB();
+
 
 // =========================================================
-// تعریف مدل‌ها (Schemas)
-// =========================================================
-
-// 1. مدل منو (Menu)
-const MenuSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    category: { type: String, required: true },
-    price: { type: Number, required: true },
-    description: String,
-    image: String // لینک عکس (URL) اینجا ذخیره می‌شود
-});
-const Menu = mongoose.model('Menu', MenuSchema);
-
-// 2. مدل گالری (Gallery) - جدید
-const GallerySchema = new mongoose.Schema({
-    image: { type: String, required: true }, // لینک عکس (URL)
-    caption: String,
-    createdAt: { type: Date, default: Date.now }
-});
-const Gallery = mongoose.model('Gallery', GallerySchema);
-
-// 3. مدل رزرو (Reservation)
-const ReservationSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    date: { type: String, required: true },
-    time: { type: String, required: true },
-    guests: { type: String, required: true },
-    space: String,    // نوع فضا (اضافه شده طبق فرم)
-    occasion: String, // مناسبت (اضافه شده طبق فرم)
-    createdAt: { type: Date, default: Date.now }
-});
-const Reservation = mongoose.model('Reservation', ReservationSchema);
-
-// 4. مدل تنظیمات تم (Settings)
-const SettingsSchema = new mongoose.Schema({
-    key: String, // مثلا 'theme'
-    value: Object // مثلا { primary: '#...', bg: '#...' }
-});
-const Settings = mongoose.model('Settings', SettingsSchema);
-
-
-// =========================================================
-// API Routes (مسیرهای ارتباطی)
+// API Routes (مسیرهای ارتباطی با SQL)
 // =========================================================
 
 // --- مدیریت منو ---
 app.get('/api/menu', async (req, res) => {
     try {
-        const items = await Menu.find();
-        res.json(items);
+        const result = await pool.query('SELECT * FROM menu ORDER BY id ASC');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/menu', async (req, res) => {
     try {
-        // req.body شامل name, category, price, description, image (لینک) است
-        const newItem = new Menu(req.body);
-        await newItem.save();
-        res.json(newItem);
+        const { name, category, price, description, image } = req.body;
+        const result = await pool.query(
+            'INSERT INTO menu (name, category, price, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [name, category, price, description, image]
+        );
+        res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/menu/:id', async (req, res) => {
     try {
-        await Menu.findByIdAndDelete(req.params.id);
+        await pool.query('DELETE FROM menu WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -92,23 +112,25 @@ app.delete('/api/menu/:id', async (req, res) => {
 // --- مدیریت گالری ---
 app.get('/api/gallery', async (req, res) => {
     try {
-        const images = await Gallery.find().sort({ createdAt: -1 });
-        res.json(images);
+        const result = await pool.query('SELECT * FROM gallery ORDER BY created_at DESC');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/gallery', async (req, res) => {
     try {
-        // req.body شامل image (لینک) و caption است
-        const newImage = new Gallery(req.body);
-        await newImage.save();
-        res.json({ success: true, id: newImage._id });
+        const { image, caption } = req.body;
+        const result = await pool.query(
+            'INSERT INTO gallery (image, caption) VALUES ($1, $2) RETURNING *',
+            [image, caption]
+        );
+        res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/gallery/:id', async (req, res) => {
     try {
-        await Gallery.findByIdAndDelete(req.params.id);
+        await pool.query('DELETE FROM gallery WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -116,22 +138,25 @@ app.delete('/api/gallery/:id', async (req, res) => {
 // --- مدیریت رزروها ---
 app.get('/api/reservations', async (req, res) => {
     try {
-        const list = await Reservation.find().sort({ createdAt: -1 });
-        res.json(list);
+        const result = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/reservations', async (req, res) => {
     try {
-        const newRes = new Reservation(req.body);
-        await newRes.save();
-        res.json(newRes);
+        const { name, phone, date, time, guests, space, occasion } = req.body;
+        const result = await pool.query(
+            'INSERT INTO reservations (name, phone, date, time, guests, space, occasion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [name, phone, date, time, guests, space, occasion]
+        );
+        res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/reservations/:id', async (req, res) => {
     try {
-        await Reservation.findByIdAndDelete(req.params.id);
+        await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -139,28 +164,33 @@ app.delete('/api/reservations/:id', async (req, res) => {
 // --- تنظیمات تم ---
 app.get('/api/theme', async (req, res) => {
     try {
-        const theme = await Settings.findOne({ key: 'theme' });
-        res.json(theme ? theme.value : { primary: '#d4af37', bg: '#0f0f0f' });
+        const result = await pool.query("SELECT value FROM settings WHERE key = 'theme'");
+        if (result.rows.length > 0) {
+            res.json(result.rows[0].value);
+        } else {
+            res.json({ primary: '#d4af37', bg: '#0f0f0f' });
+        }
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/theme', async (req, res) => {
     try {
-        await Settings.findOneAndUpdate(
-            { key: 'theme' }, 
-            { key: 'theme', value: req.body }, 
-            { upsert: true }
+        const value = req.body;
+        // Upsert برای Postgres
+        await pool.query(
+            `INSERT INTO settings (key, value) VALUES ('theme', $1) 
+             ON CONFLICT (key) DO UPDATE SET value = $1`,
+            [value]
         );
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// مسیر پیش‌فرض برای تمام درخواست‌های دیگر (برای اینکه رفرش صفحه کار کند)
-// این خط اختیاری است اما برای SPA ها مفید است
+// مسیر پیش‌فرض
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// --- اجرای سرور ---
+// --- اجرا ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
