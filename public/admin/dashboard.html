@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skymoon Admin Dashboard</title>
+    <title>داشبورد مدیریت اسکای مون</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,16 +13,16 @@
 
     <aside class="w-64 bg-gray-800 border-l border-gray-700 flex flex-col hidden md:flex">
         <div class="p-6 text-center border-b border-gray-700">
-            <h1 class="text-xl font-bold text-yellow-500">Admin Panel</h1>
+            <h1 class="text-xl font-bold text-yellow-500">پنل مدیریت</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-calendar-alt ml-3"></i>Reservations</button>
-            <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-utensils ml-3"></i>Menu Management</button>
-            <button onclick="switchTab('gallery')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-images ml-3"></i>Gallery Management</button>
-            <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-paint-brush ml-3"></i>Site Theme</button>
+            <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-calendar-alt ml-3"></i>رزروهای رسیده</button>
+            <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-utensils ml-3"></i>مدیریت منو</button>
+            <button onclick="switchTab('gallery')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-images ml-3"></i>مدیریت گالری</button>
+            <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-paint-brush ml-3"></i>تنظیمات سایت</button>
         </nav>
         <div class="p-4">
-            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded">Logout</button>
+            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded">خروج</button>
         </div>
     </aside>
 
@@ -30,91 +30,91 @@
         
         <section id="reservations-section" class="tab-content">
             <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
-                <h2 class="text-3xl font-bold text-yellow-500">Recent Reservations</h2>
-                <button onclick="loadReservations()" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-sync ml-1"></i>Refresh</button>
+                <h2 class="text-3xl font-bold text-yellow-500">رزروهای اخیر</h2>
+                <button onclick="loadReservations()" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-sync ml-1"></i>بروزرسانی</button>
             </div>
             <div id="reservations-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="text-gray-400">Loading data...</div>
+                <div class="text-gray-400">در حال دریافت اطلاعات...</div>
             </div>
         </section>
 
         <section id="menu-section" class="tab-content hidden">
             <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
-                <h2 class="text-3xl font-bold text-yellow-500">Menu List</h2>
-                <button onclick="document.getElementById('addMenuModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-sm font-bold"><i class="fas fa-plus ml-2"></i>Add Item</button>
+                <h2 class="text-3xl font-bold text-yellow-500">لیست منو</h2>
+                <button onclick="document.getElementById('addMenuModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-sm font-bold"><i class="fas fa-plus ml-2"></i>افزودن آیتم</button>
             </div>
             
             <div class="overflow-x-auto bg-gray-800 rounded-lg">
                 <table class="w-full text-right">
                     <thead class="bg-gray-700 text-yellow-500">
                         <tr>
-                            <th class="p-4">Image</th>
-                            <th class="p-4">Item Name</th>
-                            <th class="p-4">Category</th>
-                            <th class="p-4">Price</th>
-                            <th class="p-4">Actions</th>
+                            <th class="p-4">تصویر</th>
+                            <th class="p-4">نام آیتم</th>
+                            <th class="p-4">دسته‌بندی</th>
+                            <th class="p-4">قیمت</th>
+                            <th class="p-4">عملیات</th>
                         </tr>
                     </thead>
-                    <tbody id="menu-table-body">
-                        </tbody>
+                    <tbody id="menu-table-body"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="gallery-section" class="tab-content hidden">
             <div class="bg-gray-800 p-6 rounded-lg mb-8 border border-gray-700">
-                <h2 class="text-xl font-bold text-yellow-500 mb-4">Add Image to Gallery</h2>
-                <p class="text-xs text-gray-500 mb-4">Enter direct image URL.</p>
-                
+                <h2 class="text-xl font-bold text-yellow-500 mb-4">افزودن تصویر به گالری</h2>
                 <form id="uploadGalleryForm" class="flex flex-col md:flex-row gap-4 items-end">
                     <div class="w-full">
-                        <label class="block text-gray-400 text-sm mb-2">Image URL</label>
+                        <label class="block text-gray-400 text-sm mb-2">لینک تصویر</label>
                         <input type="url" id="galleryUrl" placeholder="https://..." required class="w-full bg-gray-900 text-white rounded p-2 text-sm border border-gray-700 text-left" dir="ltr">
                     </div>
                     <div class="w-full">
-                         <label class="block text-gray-400 text-sm mb-2">Caption (Optional)</label>
-                         <input type="text" id="galleryCaption" placeholder="e.g. Birthday Party" class="w-full bg-gray-900 text-white rounded p-2 border border-gray-700 focus:border-yellow-500 outline-none">
+                         <label class="block text-gray-400 text-sm mb-2">توضیح (اختیاری)</label>
+                         <input type="text" id="galleryCaption" placeholder="مثلاً: فضای تولد" class="w-full bg-gray-900 text-white rounded p-2 border border-gray-700 focus:border-yellow-500 outline-none">
                     </div>
-                    <button type="submit" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2.5 rounded font-bold whitespace-nowrap transition h-fit">Add</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2.5 rounded font-bold whitespace-nowrap transition h-fit">افزودن</button>
                 </form>
             </div>
-        
-            <h3 class="text-2xl font-bold text-white mb-4 border-b border-gray-700 pb-2">Existing Images</h3>
-            <div id="gallery-admin-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                </div>
+            <div id="gallery-admin-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
         </section>
 
         <section id="theme-section" class="tab-content hidden">
-            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-2">Site Appearance Settings</h2>
+            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-2">تنظیمات ظاهر سایت</h2>
             <div class="bg-gray-800 p-6 rounded-lg max-w-xl border border-gray-700">
                 <form id="themeForm" class="space-y-6">
                     <div>
-                        <label class="block text-sm text-gray-400 mb-2">Primary Color (Accent Color)</label>
+                        <label class="block text-sm text-gray-400 mb-2">رنگ اصلی (Accent Color)</label>
                         <div class="flex gap-2 items-center">
                             <input type="color" id="primaryColorPicker" class="h-10 w-10 bg-transparent border-0 cursor-pointer rounded">
                             <input type="text" id="primaryColorText" class="flex-1 bg-gray-700 rounded p-2 text-white text-left" dir="ltr">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-400 mb-2">Background Color (Main Theme)</label>
+                        <label class="block text-sm text-gray-400 mb-2">رنگ پس‌زمینه (تم اصلی)</label>
                         <div class="flex gap-2 items-center">
                             <input type="color" id="bgColorPicker" class="h-10 w-10 bg-transparent border-0 cursor-pointer rounded">
                             <input type="text" id="bgColorText" class="flex-1 bg-gray-700 rounded p-2 text-white text-left" dir="ltr">
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-700 pt-4 mt-4">
-                        <label class="block text-sm text-yellow-500 mb-2 font-bold"><i class="fas fa-holly-berry ml-2"></i>Seasonal Mode (Special Effect)</label>
-                        <select id="occasionSelect" class="w-full bg-gray-700 text-white p-3 rounded focus:outline-none focus:border-yellow-500 border border-gray-600">
-                            <option value="none">Simple (No Effect)</option>
-                            <option value="christmas">🎄 Christmas (Snow + Winter Theme)</option>
-                            <option value="yalda">🍉 Yalda Night (Red Theme + Pomegranate)</option>
-                            <option value="nowruz">🌱 Nowruz (Blossoms + Greenery)</option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-2">Selecting an option will automatically change the main site's appearance.</p>
+                    <div>
+                        <label class="block text-sm text-yellow-500 mb-2 font-bold"><i class="fas fa-image ml-2"></i>تصویر پس‌زمینه اصلی (Hero Image)</label>
+                        <input type="url" id="heroImageInput" placeholder="https://..." class="w-full bg-gray-900 text-white rounded p-3 border border-gray-600 text-left focus:border-yellow-500 focus:outline-none" dir="ltr">
+                        <p class="text-xs text-gray-500 mt-1">لینک مستقیم تصویر را وارد کنید. (اگر خالی باشد، عکس پیش‌فرض نمایش داده می‌شود)</p>
                     </div>
 
-                    <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded hover:bg-yellow-400 transition">Save Settings</button>
+                    <div class="border-t border-gray-700 pt-4 mt-4">
+                        <label class="block text-sm text-yellow-500 mb-2 font-bold"><i class="fas fa-holly-berry ml-2"></i>حالت مناسبتی (افکت ویژه)</label>
+                        <select id="occasionSelect" class="w-full bg-gray-700 text-white p-3 rounded focus:outline-none focus:border-yellow-500 border border-gray-600">
+                            <option value="none">ساده (بدون افکت)</option>
+                            <option value="christmas">🎄 کریسمس (برف + تم زمستانی)</option>
+                            <option value="yalda">🍉 شب یلدا (تم قرمز + انار)</option>
+                            <option value="nowruz">🌱 عید نوروز (شکوفه + سبزه)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-2">با انتخاب هر گزینه، ظاهر سایت اصلی به صورت خودکار تغییر می‌کند.</p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded hover:bg-yellow-400 transition">ذخیره تنظیمات</button>
                 </form>
             </div>
         </section>
@@ -122,16 +122,16 @@
 
     <div id="addMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-white">Add New Item</h3>
+            <h3 class="text-xl font-bold mb-4 text-white">افزودن آیتم جدید</h3>
             <form id="addMenuForm" class="space-y-3">
-                <input type="text" id="itemName" placeholder="Name" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <input type="text" id="itemCategory" placeholder="Category (e.g. coffee)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <input type="number" id="itemPrice" placeholder="Price (Tomans)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <input type="url" id="itemImage" placeholder="Image URL (Optional)" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600" dir="ltr">
-                <textarea id="itemDesc" placeholder="Description..." class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600"></textarea>
+                <input type="text" id="itemName" placeholder="نام غذا/نوشیدنی" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
+                <input type="text" id="itemCategory" placeholder="دسته‌بندی (مثلاً: coffee)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
+                <input type="number" id="itemPrice" placeholder="قیمت (تومان)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
+                <input type="url" id="itemImage" placeholder="لینک تصویر (اختیاری)" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600" dir="ltr">
+                <textarea id="itemDesc" placeholder="توضیحات..." class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600"></textarea>
                 <div class="flex justify-end gap-2 mt-4">
-                    <button type="button" onclick="document.getElementById('addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-yellow-500 text-black rounded font-bold hover:bg-yellow-400">Save</button>
+                    <button type="button" onclick="document.getElementById('addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-500 text-black rounded font-bold hover:bg-yellow-400">ذخیره</button>
                 </div>
             </form>
         </div>
@@ -139,188 +139,121 @@
 
     <div id="editMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-gray-800 p-6 rounded-lg w-96 border border-yellow-500 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-yellow-500">Edit Item</h3>
+            <h3 class="text-xl font-bold mb-4 text-yellow-500">ویرایش آیتم</h3>
             <form id="editMenuForm" class="space-y-3">
-                <input type="hidden" id="editItemId"> <label class="text-xs text-gray-400">Name:</label>
+                <input type="hidden" id="editItemId">
+                <label class="text-xs text-gray-400">نام:</label>
                 <input type="text" id="editItemName" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                
-                <label class="text-xs text-gray-400">Category:</label>
+                <label class="text-xs text-gray-400">دسته‌بندی:</label>
                 <input type="text" id="editItemCategory" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                
-                <label class="text-xs text-gray-400">Price:</label>
+                <label class="text-xs text-gray-400">قیمت:</label>
                 <input type="number" id="editItemPrice" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                
-                <label class="text-xs text-gray-400">Image URL:</label>
+                <label class="text-xs text-gray-400">لینک تصویر:</label>
                 <input type="url" id="editItemImage" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600" dir="ltr">
-                
-                <label class="text-xs text-gray-400">Description:</label>
+                <label class="text-xs text-gray-400">توضیحات:</label>
                 <textarea id="editItemDesc" class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600"></textarea>
-                
                 <div class="flex justify-end gap-2 mt-4">
-                    <button type="button" onclick="document.getElementById('editMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded font-bold">Update</button>
+                    <button type="button" onclick="document.getElementById('editMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded font-bold">بروزرسانی</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // --- Security Check (Auth Check) ---
+        // --- احراز هویت ---
         const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
-        if (isLoggedIn !== 'true') {
-            window.location.href = "login.html";
-        }
+        if (isLoggedIn !== 'true') window.location.href = "login.html";
+        document.getElementById('logoutBtn').addEventListener('click', () => { if(confirm('خروج؟')) { localStorage.removeItem('isAdminLoggedIn'); window.location.href = 'login.html'; }});
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('isAdminLoggedIn');
-                window.location.href = 'login.html';
-            }
-        });
-
-        // 1. Tab Switching Function
+        // --- تغییر تب‌ها ---
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId + '-section').classList.remove('hidden');
         }
 
         // =========================================================
-        // 2. Reservations Management
+        // مدیریت رزروها
         // =========================================================
         async function loadReservations() {
             const container = document.getElementById('reservations-list');
             try {
                 const res = await fetch('/api/reservations');
-                if(!res.ok) throw new Error('Connection error');
+                if(!res.ok) throw new Error('خطا');
                 const list = await res.json();
-                
                 container.innerHTML = '';
-                if(list.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500">No reservations found.</p>';
-                    return;
-                }
+                if(list.length === 0) { container.innerHTML = '<p class="text-gray-500">هیچ رزروی موجود نیست.</p>'; return; }
 
                 list.forEach(item => {
-                    const card = `
-                        <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative group">
+                    container.innerHTML += `
+                        <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative">
                             <h3 class="font-bold text-lg text-white mb-2">${item.name}</h3>
-                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-2 text-yellow-600"></i> ${item.date} | ${item.time}</p>
-                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-2 text-yellow-600"></i> ${item.guests}</p>
-                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-couch ml-2 text-yellow-600"></i> ${item.space || 'Not specified'}</p>
-                            <p class="text-gray-400 text-sm mb-3"><i class="fas fa-phone ml-2 text-yellow-600"></i> ${item.phone}</p>
-                            <div class="flex justify-end mt-2 border-t border-gray-700 pt-2">
-                                <button onclick="deleteRes('${item.id}')" class="text-red-400 text-sm hover:text-red-200 transition flex items-center gap-1"><i class="fas fa-trash"></i> Delete Reservation</button>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
+                            <p class="text-gray-400 text-sm mb-1">${item.date} | ${item.time}</p>
+                            <p class="text-gray-400 text-sm mb-1">${item.guests} نفر | ${item.phone}</p>
+                            <button onclick="deleteRes('${item.id}')" class="text-red-400 text-sm absolute top-4 left-4"><i class="fas fa-trash"></i></button>
+                        </div>`;
                 });
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = '<p class="text-red-500">Error fetching reservations</p>';
-            }
+            } catch (e) { container.innerHTML = '<p class="text-red-500">خطا در دریافت</p>'; }
         }
-
-        window.deleteRes = async (id) => {
-            if(confirm('Are you sure you want to delete this reservation?')) {
-                try {
-                    await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
-                    loadReservations();
-                } catch (e) { alert('Error deleting'); }
-            }
-        }
-
-                // ... (کدهای قبلی)
+        window.deleteRes = async (id) => { if(confirm('حذف رزرو؟')) { await fetch(`/api/reservations/${id}`, { method: 'DELETE' }); loadReservations(); } }
 
         // =========================================================
-        // 3. Menu Management (With Star Feature)
+        // مدیریت منو (با ستاره و ویرایش)
         // =========================================================
         async function loadMenu() {
             const tableBody = document.getElementById('menu-table-body');
             try {
                 const res = await fetch('/api/menu');
                 const list = await res.json();
-
                 tableBody.innerHTML = '';
                 list.forEach(item => {
-                    const formattedPrice = Number(item.price).toLocaleString();
+                    const price = Number(item.price).toLocaleString();
                     const imgUrl = item.image || 'https://via.placeholder.com/50';
                     const safeName = item.name.replace(/'/g, "&apos;");
                     const safeDesc = (item.description || "").replace(/'/g, "&apos;");
 
-                    // تعیین رنگ ستاره (پررنگ اگر ویژه باشد، کمرنگ اگر نباشد)
+                    // رنگ ستاره: زرد (ویژه) یا خاکستری
                     const starColor = item.is_featured ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400';
-                    const starIcon = item.is_featured ? 'fas' : 'far'; // آیکون توپر یا توخالی
+                    const starIcon = item.is_featured ? 'fas' : 'far';
 
-                    const row = `
-                        <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                            <td class="p-4">
-                                <img src="${imgUrl}" class="w-10 h-10 rounded object-cover bg-gray-600">
-                            </td>
+                    tableBody.innerHTML += `
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="p-4"><img src="${imgUrl}" class="w-10 h-10 rounded object-cover bg-gray-600"></td>
                             <td class="p-4 font-bold text-white">
                                 ${item.name}
-                                ${item.is_featured ? '<span class="text-xs bg-yellow-500 text-black px-1 rounded ml-2">ویژه</span>' : ''}
+                                ${item.is_featured ? '<span class="text-xs bg-yellow-500 text-black px-1 rounded ml-1">ویژه</span>' : ''}
                             </td>
                             <td class="p-4 text-sm text-gray-400">${item.category}</td>
-                            <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
+                            <td class="p-4 text-yellow-500 font-bold">${price} تومان</td>
                             <td class="p-4 flex gap-2 justify-end">
-                                <button onclick="toggleFeature('${item.id}')" class="${starColor} text-lg px-2 transition" title="انتخاب به عنوان پیشنهاد سرآشپز">
+                                <button onclick="toggleFeature('${item.id}')" class="${starColor} text-lg px-2 transition" title="پیشنهاد ویژه">
                                     <i class="${starIcon} fa-star"></i>
                                 </button>
-                                
-                                <button onclick="openEditModal('${item.id}', '${safeName}', '${item.category}', '${item.price}', '${item.image||''}', '${safeDesc}')" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition" title="ویرایش"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteItem('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 transition" title="حذف"><i class="fas fa-trash"></i></button>
+                                <button onclick="openEditModal('${item.id}', '${safeName}', '${item.category}', '${item.price}', '${item.image||''}', '${safeDesc}')" class="bg-blue-600 px-2 py-1 rounded text-white hover:bg-blue-500"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${item.id}')" class="bg-red-600 px-2 py-1 rounded text-white hover:bg-red-500"><i class="fas fa-trash"></i></button>
                             </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
+                        </tr>`;
                 });
-            } catch (error) { console.error(error); }
-        }
-
-        // تابع جدید: تغییر وضعیت ستاره
-        window.toggleFeature = async (id) => {
-            try {
-                const res = await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' });
-                if (res.ok) {
-                    loadMenu(); // ریلود کردن جدول برای دیدن تغییر رنگ ستاره
-                } else {
-                    alert('خطا در تغییر وضعیت');
-                }
             } catch (e) { console.error(e); }
         }
 
-        // ... (بقیه کدهای addMenuForm, editMenuForm و غیره بدون تغییر)
-
-
-        // Add New Item
+        // تابع تغییر ستاره (ویژه بودن)
+        window.toggleFeature = async (id) => { 
+            try {
+                await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' }); 
+                loadMenu(); 
+            } catch(e){ alert('خطا در ارتباط با سرور'); }
+        }
+        
+        // افزودن آیتم
         document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newItem = {
-                name: document.getElementById('itemName').value,
-                category: document.getElementById('itemCategory').value,
-                price: document.getElementById('itemPrice').value,
-                description: document.getElementById('itemDesc').value,
-                image: document.getElementById('itemImage').value
-            };
-
-            try {
-                const res = await fetch('/api/menu', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newItem)
-                });
-                if(res.ok) {
-                    document.getElementById('addMenuModal').classList.add('hidden');
-                    e.target.reset();
-                    loadMenu();
-                    alert('Item added successfully!');
-                }
-            } catch(e) { alert('Error saving'); }
+            const data = { name: document.getElementById('itemName').value, category: document.getElementById('itemCategory').value, price: document.getElementById('itemPrice').value, description: document.getElementById('itemDesc').value, image: document.getElementById('itemImage').value };
+            await fetch('/api/menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            document.getElementById('addMenuModal').classList.add('hidden'); e.target.reset(); loadMenu();
         });
 
-        // --- Edit Item Functions ---
+        // باز کردن مودال ویرایش
         window.openEditModal = (id, name, cat, price, img, desc) => {
             document.getElementById('editItemId').value = id;
             document.getElementById('editItemName').value = name;
@@ -328,149 +261,68 @@
             document.getElementById('editItemPrice').value = price;
             document.getElementById('editItemImage').value = img;
             document.getElementById('editItemDesc').value = desc;
-            
             document.getElementById('editMenuModal').classList.remove('hidden');
         };
 
+        // ثبت ویرایش
         document.getElementById('editMenuForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('editItemId').value;
-            const updatedItem = {
-                name: document.getElementById('editItemName').value,
-                category: document.getElementById('editItemCategory').value,
-                price: document.getElementById('editItemPrice').value,
-                description: document.getElementById('editItemDesc').value,
-                image: document.getElementById('editItemImage').value
-            };
-
-            try {
-                const res = await fetch(`/api/menu/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedItem)
-                });
-                
-                if(res.ok) {
-                    document.getElementById('editMenuModal').classList.add('hidden');
-                    loadMenu();
-                    alert('Item updated successfully!');
-                }
-            } catch(e) { alert('Error updating'); }
+            const data = { name: document.getElementById('editItemName').value, category: document.getElementById('editItemCategory').value, price: document.getElementById('editItemPrice').value, description: document.getElementById('editItemDesc').value, image: document.getElementById('editItemImage').value };
+            await fetch(`/api/menu/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            document.getElementById('editMenuModal').classList.add('hidden'); loadMenu();
         });
 
-        window.deleteItem = async (id) => {
-            if(confirm('Delete this item from menu?')) {
-                try {
-                    await fetch(`/api/menu/${id}`, { method: 'DELETE' });
-                    loadMenu();
-                } catch(e) { alert('Error deleting'); }
-            }
-        }
+        window.deleteItem = async (id) => { if(confirm('حذف شود؟')) { await fetch(`/api/menu/${id}`, { method: 'DELETE' }); loadMenu(); } }
 
         // =========================================================
-        // 4. Gallery Management
+        // مدیریت گالری
         // =========================================================
         async function loadGallery() {
-            const grid = document.getElementById('gallery-admin-grid');
-            grid.innerHTML = '<p class="text-gray-500">Loading...</p>';
-            
-            try {
-                const res = await fetch('/api/gallery');
-                const images = await res.json();
-                grid.innerHTML = '';
-                
-                if(images.length === 0) {
-                    grid.innerHTML = '<p class="text-gray-500 col-span-full">No images in gallery</p>';
-                    return;
-                }
-
-                images.forEach(img => {
-                    const safeImg = img.image || 'https://via.placeholder.com/150';
-                    grid.innerHTML += `
-                        <div class="relative group rounded overflow-hidden border border-gray-700 aspect-square bg-black">
-                            <img src="${safeImg}" class="w-full h-full object-cover">
-                            <button onclick="deleteGalleryImage('${img.id}')" class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-500 transition shadow-lg opacity-80 group-hover:opacity-100"><i class="fas fa-trash"></i></button>
-                            <div class="absolute bottom-0 left-0 w-full bg-black/60 p-2 text-xs text-center truncate">${img.caption || ''}</div>
-                        </div>
-                    `;
-                });
-            } catch (e) { console.error(e); }
+            const list = await (await fetch('/api/gallery')).json();
+            const grid = document.getElementById('gallery-admin-grid'); grid.innerHTML = '';
+            list.forEach(i => grid.innerHTML += `<div class="relative group aspect-square rounded overflow-hidden bg-black"><img src="${i.image}" class="w-full h-full object-cover"><button onclick="deleteGalleryImage('${i.id}')" class="absolute top-1 right-1 bg-red-600 w-6 h-6 rounded flex items-center justify-center text-white"><i class="fas fa-trash text-xs"></i></button></div>`);
         }
-
-        document.getElementById('uploadGalleryForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = e.target.querySelector('button');
-            submitBtn.innerText = '...'; submitBtn.disabled = true;
-
-            const newImage = {
-                image: document.getElementById('galleryUrl').value,
-                caption: document.getElementById('galleryCaption').value
-            };
-
-            try {
-                const res = await fetch('/api/gallery', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newImage)
-                });
-                if(res.ok) {
-                    alert('Image added to gallery');
-                    document.getElementById('galleryUrl').value = '';
-                    document.getElementById('galleryCaption').value = '';
-                    loadGallery();
-                } else { alert('Error saving'); }
-            } catch(err) { alert('Server error'); } 
-            finally { submitBtn.innerText = 'Add'; submitBtn.disabled = false; }
-        });
-
-        window.deleteGalleryImage = async (id) => {
-            if(confirm('Delete this image?')) {
-                await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
-                loadGallery();
-            }
-        };
+        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{e.preventDefault(); await fetch('/api/gallery', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image:document.getElementById('galleryUrl').value, caption:document.getElementById('galleryCaption').value})}); e.target.reset(); loadGallery();});
+        window.deleteGalleryImage = async(id)=>{if(confirm('حذف عکس؟')){await fetch(`/api/gallery/${id}`, {method:'DELETE'}); loadGallery();}};
 
         // =========================================================
-        // 5. Theme Settings
+        // تنظیمات تم (رنگ + تصویر پس‌زمینه + مناسبت)
         // =========================================================
         async function loadThemeSettings() {
             try {
-                const res = await fetch('/api/theme');
-                const theme = await res.json();
-                
-                document.getElementById('primaryColorText').value = theme.primary || '#d4af37';
+                const theme = await (await fetch('/api/theme')).json();
                 document.getElementById('primaryColorPicker').value = theme.primary || '#d4af37';
-                document.getElementById('bgColorText').value = theme.bg || '#0f0f0f';
+                document.getElementById('primaryColorText').value = theme.primary || '#d4af37';
                 document.getElementById('bgColorPicker').value = theme.bg || '#0f0f0f';
+                document.getElementById('bgColorText').value = theme.bg || '#0f0f0f';
                 
-                // Set Occasion
                 document.getElementById('occasionSelect').value = theme.occasion || 'none';
-            } catch(e) { console.log('Theme default'); }
+                
+                // لود کردن عکس بک‌گراند
+                document.getElementById('heroImageInput').value = theme.heroImage || ''; 
+            } catch(e) {}
         }
 
         document.getElementById('themeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const themeData = {
+            const data = {
                 primary: document.getElementById('primaryColorText').value,
                 bg: document.getElementById('bgColorText').value,
-                occasion: document.getElementById('occasionSelect').value // Save Occasion
+                occasion: document.getElementById('occasionSelect').value,
+                heroImage: document.getElementById('heroImageInput').value // ذخیره تصویر
             };
-            
-            await fetch('/api/theme', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(themeData)
-            });
-            alert('Theme settings applied! Check the main site.');
+            await fetch('/api/theme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            alert('تنظیمات ذخیره شد! سایت اصلی را چک کنید.');
         });
 
-        // Sync inputs
-        document.getElementById('primaryColorPicker').addEventListener('input', (e) => document.getElementById('primaryColorText').value = e.target.value);
-        document.getElementById('bgColorPicker').addEventListener('input', (e) => document.getElementById('bgColorText').value = e.target.value);
+        // هماهنگی ورودی‌های رنگ
+        ['primary', 'bg'].forEach(t => {
+            document.getElementById(t+'ColorPicker').addEventListener('input', e => document.getElementById(t+'ColorText').value = e.target.value);
+            document.getElementById(t+'ColorText').addEventListener('input', e => document.getElementById(t+'ColorPicker').value = e.target.value);
+        });
 
-        // =========================================================
-        // Initial Load
-        // =========================================================
+        // اجرای اولیه
         loadReservations();
         loadMenu();
         loadGallery();
