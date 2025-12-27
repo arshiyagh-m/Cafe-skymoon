@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کافه اسکای مون | کیفیت بالا بدون فیلتر</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#d4af37', // رنگ اصلی طلایی
+                            600: '#b4942b',
+                        },
+                        dark: {
+                            900: '#0f0f0f', // پس زمینه خیلی تیره
+                            800: '#1a1a1a', // کارت‌ها
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f0f0f; color: #f3f4f6; }
+        .text-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="1000221539.jpg" alt="Skymoon Logo" class="h-12 w-12 rounded-full object-cover border border-gold-500">
+                <span class="text-xl font-bold text-gold-500 tracking-wide">کافه اسکای مون</span>
+            </a>
+
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="index.html" class="text-gold-500">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500 transition">منو</a>
+                <a href="reservation.html" class="hover:text-gold-500 transition">رزرو میز</a>
+                <a href="gallery.html" class="hover:text-gold-500 transition">گالری</a>
+                <a href="contact.html" class="hover:text-gold-500 transition">تماس با ما</a>
+            </nav>
+
+            <button id="mobile-menu-btn" class="md:hidden text-2xl text-gold-500">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-800 border-t border-white/10">
+            <div class="flex flex-col p-4 space-y-3 text-center">
+                <a href="index.html" class="text-gold-500">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500">منو</a>
+                <a href="reservation.html" class="hover:text-gold-500">رزرو میز</a>
+                <a href="gallery.html" class="hover:text-gold-500">گالری</a>
+                <a href="contact.html" class="hover:text-gold-500">تماس با ما</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat bg-fixed mt-16">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative z-10 text-center px-4">
+            <img src="1000221539.jpg" class="h-24 w-24 mx-auto mb-4 rounded-full border-2 border-gold-500 shadow-lg animate-fade-in" alt="Logo">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 text-shadow">کافه اسکای مون</h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-8 font-light tracking-wider">"کیفیت بالا بدون فیلتر"</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="menu.html" class="px-8 py-3 bg-gold-500 text-dark-900 font-bold rounded hover:bg-gold-400 transition transform hover:-translate-y-1">مشاهده منو</a>
+                <a href="reservation.html" class="px-8 py-3 border border-white text-white font-bold rounded hover:bg-white hover:text-dark-900 transition transform hover:-translate-y-1">رزرو میز</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-dark-900 text-center container mx-auto px-4">
+        <h2 class="text-3xl text-gold-500 mb-6 font-bold">درباره ما</h2>
+        <p class="max-w-3xl mx-auto text-gray-400 leading-8">
+            در کافه اسکای مون، ما به شفافیت و اصالت معتقدیم. شعار ما "کیفیت بالا بدون فیلتر" تنها یک جمله نیست، بلکه تعهد ما به استفاده از تازه‌ترین مواد اولیه، قهوه‌های رست شده با دقت و فضایی است که در آن آرامش واقعی را تجربه خواهید کرد. اینجا همه چیز واقعی است.
+        </p>
+    </section>
+
+    <section class="py-16 bg-dark-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl text-gold-500 mb-10 text-center font-bold border-b border-gold-500/30 pb-4 inline-block mx-auto flex w-fit">پیشنهاد سرآشپز</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Chiken Alfredo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">چیکن آلفردو</h3>
+                        <p class="text-sm text-gray-400 mb-4">پاستا پنه، سینه مرغ گریل، سس آلفردو مخصوص، قارچ، پنیر پارمزان</p>
+                        <span class="text-gold-500 font-bold text-lg">۲۴۵,۰۰۰ تومان</span>
+                    </div>
+                </div>
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Latte">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">لته آرت</h3>
+                        <p class="text-sm text-gray-400 mb-4">اسپرسو ۱۰۰٪ عربیکا، شیر فوم‌دار تازه، طراحی باریستا</p>
+                        <span class="text-gold-500 font-bold text-lg">۹۵,۰۰۰ تومان</span>
+                    </div>
+                </div>
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Steak">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">رست بیف مخصوص</h3>
+                        <p class="text-sm text-gray-400 mb-4">گوشت گوساله رست شده، سس قارچ، پنیر گودا، نان چیاباتا</p>
+                        <span class="text-gold-500 font-bold text-lg">۲۹۰,۰۰۰ تومان</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-dark-900">
+        <div class="container mx-auto px-4 text-center">
+            <i class="fas fa-quote-right text-4xl text-gold-500 mb-6"></i>
+            <h2 class="text-2xl text-white mb-8">نظرات مشتریان ما</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="bg-dark-800 p-6 rounded-lg">
+                    <p class="text-gray-300 italic mb-4">"یه کافه عالی و دنج با پرسنل فوق‌العاده مودب. کیفیت قهوه‌هاشون واقعاً بی‌نظیره."</p>
+                    <h4 class="text-gold-500 font-bold">- سارا م.</h4>
+                </div>
+                <div class="bg-dark-800 p-6 rounded-lg">
+                    <p class="text-gray-300 italic mb-4">"محیط وی‌آی‌پی برای قرارهای کاری خیلی مناسب بود. حتما پاستا آلفردو رو امتحان کنید."</p>
+                    <h4 class="text-gold-500 font-bold">- علی رضایی</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-10 border-t border-white/10 mt-auto">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-right">
+            <div>
+                <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
+                <p class="text-gray-500 text-sm">کیفیت بالا بدون فیلتر. <br> تجربه طعم‌های واقعی در محیطی رویایی.</p>
+            </div>
+            <div>
+                <h3 class="text-gold-500 font-bold text-xl mb-4">تماس با ما</h3>
+                <p class="text-gray-400 mb-2"><i class="fas fa-map-marker-alt ml-2"></i>میاندوآب، کوی سعادت، روبروی جهاد</p>
+                <p class="text-gray-400 mb-2"><i class="fas fa-phone ml-2"></i>۰۹۱۹۴۳۵۸۴۰۰</p>
+            </div>
+            <div>
+                <h3 class="text-gold-500 font-bold text-xl mb-4">شبکه‌های اجتماعی</h3>
+                <div class="flex justify-center md:justify-start gap-4">
+                    <a href="#" class="text-2xl text-gray-400 hover:text-pink-600 transition"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-2xl text-gray-400 hover:text-blue-500 transition"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-gray-600 text-xs mt-10 border-t border-white/5 pt-4">
+            <p>&copy; 2024 Skymoon Cafe. Designed by <span class="text-gold-500">arshiya_g_m</span></p>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/989194358400" target="_blank" class="fixed bottom-6 left-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition z-50 animate-bounce">
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
