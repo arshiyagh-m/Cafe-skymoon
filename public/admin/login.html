@@ -12,28 +12,37 @@
     <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-96 border border-yellow-600">
         <h2 class="text-2xl text-yellow-500 font-bold mb-6 text-center">ورود مدیر</h2>
         <form id="loginForm" class="space-y-4">
-            <input type="email" id="email" placeholder="ایمیل" class="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 text-left" dir="ltr">
-            <input type="password" id="password" placeholder="رمز عبور" class="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 text-left" dir="ltr">
+            <input type="email" id="email" placeholder="ایمیل" class="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 text-left" dir="ltr" required>
+            <input type="password" id="password" placeholder="رمز عبور" class="w-full p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 text-left" dir="ltr" required>
             <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3 rounded transition">ورود به پنل</button>
         </form>
         <p id="errorMsg" class="text-red-500 text-center mt-4 hidden text-sm">ایمیل یا رمز عبور اشتباه است.</p>
     </div>
 
-    <script type="module">
-        import { auth, signInWithEmailAndPassword } from '../assets/js/firebase-config.js';
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // هدایت به داشبورد در صورت موفقیت
+            // --- تنظیمات نام کاربری و رمز عبور ---
+            // اینجا می‌توانید رمز دلخواه خود را تنظیم کنید
+            const VALID_EMAIL = "admin@skymoon.com";
+            const VALID_PASS = "admin123";
+
+            if (email === VALID_EMAIL && password === VALID_PASS) {
+                // ذخیره وضعیت لاگین در مرورگر
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                
+                // هدایت به داشبورد
                 window.location.href = 'dashboard.html';
-            } catch (error) {
-                document.getElementById('errorMsg').classList.remove('hidden');
-                console.error(error);
+            } else {
+                // نمایش خطا
+                errorMsg.classList.remove('hidden');
+                // لرزش فرم (اختیاری برای زیبایی)
+                e.target.classList.add('animate-pulse');
+                setTimeout(() => e.target.classList.remove('animate-pulse'), 500);
             }
         });
     </script>
