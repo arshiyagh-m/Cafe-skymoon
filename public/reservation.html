@@ -1,90 +1,220 @@
-<main class="mt-24 container mx-auto px-4 mb-16">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        
-        <div>
-            <h2 class="text-3xl text-gold-500 font-bold mb-6">فضاهای کافه</h2>
-            <div class="space-y-6">
-                <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5">
-                    <img src="https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2?w=300" class="w-1/3 object-cover" alt="VIP">
-                    <div class="p-4 flex flex-col justify-center">
-                        <h3 class="text-white font-bold text-lg">بالانشین (VIP Private)</h3>
-                        <p class="text-gray-400 text-sm">فضای دنج و اختصاصی، مناسب قرارهای دو نفره و رمانتیک.</p>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رزرو میز | کافه اسکای مون</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+                    colors: {
+                        gold: { 500: '#d4af37', 400: '#fbbf24' },
+                        dark: { 900: '#0f0f0f', 800: '#1a1a1a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f0f0f; color: #f3f4f6; }
+        /* استایل تقویم */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-xl font-bold text-gold-500 tracking-wide">کافه اسکای مون</span>
+            </a>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="index.html" class="hover:text-gold-500 transition">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500 transition">منو</a>
+                <a href="reservation.html" class="text-gold-500">رزرو میز</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mt-24 container mx-auto px-4 mb-16 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            
+            <div>
+                <h2 class="text-3xl text-gold-500 font-bold mb-6">فضاهای کافه</h2>
+                <div class="space-y-6">
+                    <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5 hover:border-gold-500/30 transition">
+                        <img src="https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2?w=300" class="w-1/3 object-cover" alt="VIP">
+                        <div class="p-4 flex flex-col justify-center">
+                            <h3 class="text-white font-bold text-lg">بالانشین (VIP Private)</h3>
+                            <p class="text-gray-400 text-sm">فضای دنج و اختصاصی، مناسب قرارهای دو نفره و رمانتیک.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5">
-                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300" class="w-1/3 object-cover" alt="Family">
-                    <div class="p-4 flex flex-col justify-center">
-                        <h3 class="text-white font-bold text-lg">VIP نیم‌طبقه</h3>
-                        <p class="text-gray-400 text-sm">محیطی آرام و خانوادگی با دید به سالن اصلی.</p>
+                    <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5 hover:border-gold-500/30 transition">
+                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300" class="w-1/3 object-cover" alt="Family">
+                        <div class="p-4 flex flex-col justify-center">
+                            <h3 class="text-white font-bold text-lg">VIP نیم‌طبقه</h3>
+                            <p class="text-gray-400 text-sm">محیطی آرام و خانوادگی با دید به سالن اصلی.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5">
-                    <img src="https://images.unsplash.com/photo-1530103862676-de3c9da59af7?w=300" class="w-1/3 object-cover" alt="Birthday">
-                    <div class="p-4 flex flex-col justify-center">
-                        <h3 class="text-white font-bold text-lg">بخش تولد</h3>
-                        <p class="text-gray-400 text-sm">فضایی بزرگ با دکوراسیون ویژه برای جشن‌های شما.</p>
+                    <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5 hover:border-gold-500/30 transition">
+                        <img src="https://images.unsplash.com/photo-1530103862676-de3c9da59af7?w=300" class="w-1/3 object-cover" alt="Birthday">
+                        <div class="p-4 flex flex-col justify-center">
+                            <h3 class="text-white font-bold text-lg">بخش تولد</h3>
+                            <p class="text-gray-400 text-sm">فضایی بزرگ با دکوراسیون ویژه برای جشن‌های شما.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="bg-dark-800 p-8 rounded-xl border border-gold-500/20 shadow-xl">
-            <h2 class="text-2xl text-white font-bold mb-6 text-center">فرم رزرو میز</h2>
-            <form id="reservation-form" class="space-y-4">
-                <div>
-                    <label class="block text-gray-400 text-sm mb-1">نام و نام خانوادگی</label>
-                    <input type="text" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm mb-1">شماره تماس</label>
-                    <input type="tel" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+    
+            <div class="bg-dark-800 p-8 rounded-xl border border-gold-500/20 shadow-xl relative">
+                <h2 class="text-2xl text-white font-bold mb-6 text-center">فرم رزرو میز</h2>
+                
+                <form id="reservation-form" class="space-y-4">
                     <div>
-                        <label class="block text-gray-400 text-sm mb-1">تاریخ</label>
-                        <input type="date" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-gray-300 focus:border-gold-500 focus:outline-none transition">
+                        <label class="block text-gray-400 text-sm mb-1">نام و نام خانوادگی</label>
+                        <input type="text" id="name" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
                     </div>
+                    
                     <div>
-                        <label class="block text-gray-400 text-sm mb-1">ساعت</label>
-                        <select class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                            <option>۱۷:۰۰ - ۱۸:۳۰</option>
-                            <option>۱۸:۳۰ - ۲۰:۰۰</option>
-                            <option>۲۰:۰۰ - ۲۱:۳۰</option>
-                            <option>۲۱:۳۰ - ۲۳:۰۰</option>
-                        </select>
+                        <label class="block text-gray-400 text-sm mb-1">شماره تماس</label>
+                        <input type="tel" id="phone" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition" placeholder="مثلاً: ۰۹۱۲۳۴۵۶۷۸۹">
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-400 text-sm mb-1">تعداد نفرات</label>
-                        <select class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                            <option>۲ نفر</option>
-                            <option>۳ تا ۴ نفر</option>
-                            <option>۵ تا ۸ نفر</option>
-                            <option>بیشتر از ۸ نفر</option>
-                        </select>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">تاریخ</label>
+                            <input type="date" id="date" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-gray-300 focus:border-gold-500 focus:outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">ساعت</label>
+                            <select id="time" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                                <option>۱۷:۰۰ - ۱۸:۳۰</option>
+                                <option>۱۸:۳۰ - ۲۰:۰۰</option>
+                                <option>۲۰:۰۰ - ۲۱:۳۰</option>
+                                <option>۲۱:۳۰ - ۲۳:۰۰</option>
+                            </select>
+                        </div>
                     </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">تعداد نفرات</label>
+                            <select id="guests" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                                <option>۲ نفر</option>
+                                <option>۳ تا ۴ نفر</option>
+                                <option>۵ تا ۸ نفر</option>
+                                <option>بیشتر از ۸ نفر</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-1">نوع فضا</label>
+                            <select id="space" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                                <option>سالن اصلی</option>
+                                <option>VIP بالانشین</option>
+                                <option>VIP نیم‌طبقه</option>
+                                <option>تولد</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div>
-                        <label class="block text-gray-400 text-sm mb-1">نوع فضا</label>
-                        <select class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                            <option>سالن اصلی</option>
-                            <option>VIP بالانشین</option>
-                            <option>VIP نیم‌طبقه</option>
+                        <label class="block text-gray-400 text-sm mb-1">مناسبت (اختیاری)</label>
+                        <select id="occasion" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                            <option value="">معمولی</option>
                             <option>تولد</option>
+                            <option>سالگرد ازدواج</option>
+                            <option>جلسه کاری</option>
                         </select>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm mb-1">مناسبت (اختیاری)</label>
-                    <select class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
-                        <option value="">معمولی</option>
-                        <option>تولد</option>
-                        <option>سالگرد ازدواج</option>
-                        <option>جلسه کاری</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-gold-500 text-dark-900 font-bold py-3 rounded mt-4 hover:bg-gold-400 transition">ثبت رزرو</button>
-            </form>
+                    
+                    <button type="submit" class="w-full bg-gold-500 text-dark-900 font-bold py-3 rounded mt-4 hover:bg-gold-400 transition flex justify-center items-center">ثبت رزرو</button>
+                </form>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+
+    <footer class="bg-black py-8 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
+            <p class="text-gray-500 text-sm mb-4">میزبانی لحظات ناب شما</p>
+            <div class="text-gray-600 text-xs">
+                © 2024
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // 1. دریافت تم از سرور
+            try {
+                const res = await fetch('/api/theme');
+                if (res.ok) {
+                    const theme = await res.json();
+                    document.documentElement.style.setProperty('--primary-color', theme.primary);
+                    // اعمال تغییر رنگ بک گراند در صورت نیاز
+                    // document.body.style.backgroundColor = theme.bg;
+                }
+            } catch(e) { console.log('Using default theme'); }
+
+            // 2. هندل کردن فرم رزرو
+            const form = document.getElementById('reservation-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // دکمه ثبت
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال ارسال...';
+                submitBtn.classList.add('opacity-75');
+
+                // جمع‌آوری اطلاعات با استفاده از ID ها
+                const reservationData = {
+                    name: document.getElementById('name').value,
+                    phone: document.getElementById('phone').value,
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    guests: document.getElementById('guests').value,
+                    space: document.getElementById('space').value, // فیلد اضافه شده
+                    occasion: document.getElementById('occasion').value // فیلد اضافه شده
+                };
+
+                try {
+                    const response = await fetch('/api/reservations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reservationData)
+                    });
+
+                    if (response.ok) {
+                        alert('رزرو شما با موفقیت ثبت شد! برای تایید نهایی با شما تماس می‌گیریم.');
+                        form.reset();
+                    } else {
+                        alert('خطا در ثبت رزرو. لطفاً دوباره تلاش کنید.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('مشکل در برقراری ارتباط با سرور.');
+                } finally {
+                    // بازگشت دکمه به حالت اول
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                    submitBtn.classList.remove('opacity-75');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
