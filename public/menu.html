@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
     
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,7 +17,7 @@
                 extend: {
                     fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
                     colors: {
-                        gold: { 500: '#d4af37', 400: '#fbbf24' },
+                        gold: { 500: 'var(--primary-color)', 400: '#fbbf24' }, // رنگ داینامیک
                         dark: { 900: '#0f0f0f', 800: '#1a1a1a' }
                     }
                 }
@@ -24,11 +25,13 @@
         }
     </script>
     <style>
+        :root { --primary-color: #d4af37; }
         body { background-color: #0f0f0f; color: #f3f4f6; }
-        /* استایل اسکرول بار افقی برای موبایل */
-        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a1a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 4px; }
+        /* مخفی کردن اسکرول بار برای زیبایی */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="font-sans leading-relaxed flex flex-col min-h-screen">
@@ -42,41 +45,27 @@
                 <a href="index.html" class="hover:text-gold-500 transition">خانه</a>
                 <a href="menu.html" class="text-gold-500">منو</a>
                 <a href="reservation.html" class="hover:text-gold-500 transition">رزرو میز</a>
+                <a href="gallery.html" class="hover:text-gold-500 transition">گالری</a>
                 <a href="admin/login.html" class="hover:text-gold-500 transition text-xs opacity-50">پنل مدیریت</a>
             </nav>
+            <a href="index.html" class="md:hidden text-gold-500 text-xl"><i class="fas fa-home"></i></a>
         </div>
     </header>
 
     <main class="mt-24 container mx-auto px-4 mb-16 flex-grow">
-        <h1 class="text-4xl text-center text-gold-500 font-bold mb-8">منوی کافه</h1>
+        <h1 class="text-4xl text-center text-gold-500 font-bold mb-8 border-b border-white/10 pb-4 w-fit mx-auto">منوی کافه</h1>
         
-        <div class="flex overflow-x-auto pb-4 mb-8 gap-2 custom-scrollbar justify-start md:justify-center">
-            <button class="menu-tab active px-6 py-2 bg-gold-500 text-dark-900 rounded-full font-bold whitespace-nowrap transition" data-target="all">همه</button>
-            <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10 hover:border-gold-500" data-target="coffee">قهوه</button>
-            <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10 hover:border-gold-500" data-target="food">غذا</button>
-            <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10 hover:border-gold-500" data-target="cold-drink">نوشیدنی سرد</button>
-            <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10 hover:border-gold-500" data-target="hookah">قلیان</button>
+        <div id="category-tabs" class="flex overflow-x-auto pb-4 mb-8 gap-3 scrollbar-hide justify-start md:justify-center">
+            <div class="h-10 w-24 bg-dark-800 rounded-full animate-pulse"></div>
+            <div class="h-10 w-24 bg-dark-800 rounded-full animate-pulse"></div>
+            <div class="h-10 w-24 bg-dark-800 rounded-full animate-pulse"></div>
         </div>
 
         <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="coffee">
-                <div class="w-24 h-24 rounded overflow-hidden ml-4 flex-shrink-0 bg-gray-700">
-                     <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200" class="w-full h-full object-cover" alt="Espresso">
-                </div>
-                <div class="flex flex-col justify-between w-full">
-                    <div>
-                        <h3 class="text-lg font-bold text-white">اسپرسو دبل</h3>
-                        <p class="text-xs text-gray-400 mt-1">۱۰۰٪ عربیکا، رست مدیوم</p>
-                    </div>
-                    <div class="text-left text-gold-500 font-bold">۵۵,۰۰۰ تومان</div>
-                </div>
-            </div>
-
             </div>
     </main>
 
-    <footer class="bg-black py-8 border-t border-white/10">
+    <footer class="bg-black py-8 border-t border-white/10 mt-auto">
         <div class="container mx-auto px-4 text-center">
             <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
             <p class="text-gray-500 text-sm mb-4">کیفیت بالا بدون فیلتر</p>
@@ -88,86 +77,115 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // 1. دریافت تم (برای هماهنگی رنگ‌ها)
+            try {
+                const themeRes = await fetch('/api/theme');
+                if(themeRes.ok) {
+                    const theme = await themeRes.json();
+                    document.documentElement.style.setProperty('--primary-color', theme.primary);
+                }
+            } catch(e) {}
+
             const menuGrid = document.getElementById('menu-grid');
-            
-            // 1. تابع دریافت دیتا از Backend (Node.js/Liara)
+            const tabsContainer = document.getElementById('category-tabs');
+            let allItems = []; // ذخیره تمام آیتم‌ها برای فیلتر سریع
+
+            // 2. دریافت آیتم‌های منو
             async function fetchMenu() {
                 try {
                     const response = await fetch('/api/menu');
-                    if (!response.ok) throw new Error('Network error');
-                    const items = await response.json();
+                    if (!response.ok) throw new Error('خطا در ارتباط');
+                    allItems = await response.json();
                     
-                    if (items.length > 0) {
-                        renderMenu(items);
+                    if (allItems.length > 0) {
+                        initCategories(allItems); // ساخت دکمه‌ها
+                        renderMenu('همه'); // نمایش اولیه همه آیتم‌ها
+                    } else {
+                        menuGrid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10">آیتمی در منو موجود نیست.</p>';
+                        tabsContainer.innerHTML = '';
                     }
                 } catch (error) {
-                    console.log('Backend not connected or empty, using static items.');
-                    // اگر ارور داد (یعنی سرور وصل نیست)، آیتم‌های استاتیک HTML باقی می‌مانند
-                    // فقط سیستم تب‌ها را روی همان استاتیک‌ها فعال می‌کنیم
-                    setupTabs(); 
+                    console.error(error);
+                    menuGrid.innerHTML = '<p class="col-span-full text-center text-red-500">خطا در بارگذاری منو. لطفا اتصال اینترنت را بررسی کنید.</p>';
+                    tabsContainer.innerHTML = '';
                 }
             }
 
-            // 2. تابع رندر کردن آیتم‌ها
-            function renderMenu(items) {
-                menuGrid.innerHTML = ''; // پاک کردن آیتم‌های استاتیک
+            // 3. ساخت دکمه‌های دسته‌بندی (Tabs)
+            function initCategories(items) {
+                // استخراج دسته‌بندی‌های یکتا از دیتابیس
+                const uniqueCategories = ['همه', ...new Set(items.map(item => item.category))];
                 
-                items.forEach(item => {
-                    const price = Number(item.price).toLocaleString();
-                    // اگر عکس نداشت، یک عکس پیش‌فرض می‌گذاریم
-                    const imageSrc = item.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=200';
+                tabsContainer.innerHTML = ''; // پاک کردن لودینگ
+
+                uniqueCategories.forEach((cat, index) => {
+                    const btn = document.createElement('button');
+                    // استایل دکمه‌ها
+                    const activeClass = index === 0 ? 'bg-gold-500 text-dark-900' : 'bg-dark-800 text-gray-300 hover:text-white hover:border-gold-500';
+                    btn.className = `px-6 py-2 rounded-full font-bold whitespace-nowrap transition border border-white/10 ${activeClass}`;
+                    btn.innerText = cat;
                     
+                    // رویداد کلیک
+                    btn.addEventListener('click', () => {
+                        // غیرفعال کردن بقیه دکمه‌ها
+                        Array.from(tabsContainer.children).forEach(b => {
+                            b.className = 'px-6 py-2 rounded-full font-bold whitespace-nowrap transition border border-white/10 bg-dark-800 text-gray-300 hover:text-white hover:border-gold-500';
+                        });
+                        // فعال کردن دکمه کلیک شده
+                        btn.className = 'px-6 py-2 rounded-full font-bold whitespace-nowrap transition border border-white/10 bg-gold-500 text-dark-900 shadow-lg shadow-gold-500/20';
+                        
+                        renderMenu(cat);
+                    });
+
+                    tabsContainer.appendChild(btn);
+                });
+            }
+
+            // 4. نمایش آیتم‌ها (Render)
+            function renderMenu(filterCategory) {
+                menuGrid.innerHTML = '';
+                
+                // فیلتر کردن
+                const filteredItems = filterCategory === 'همه' 
+                    ? allItems 
+                    : allItems.filter(item => item.category === filterCategory);
+
+                if (filteredItems.length === 0) {
+                    menuGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">در این دسته موردی یافت نشد.</p>';
+                    return;
+                }
+
+                filteredItems.forEach((item, index) => {
+                    const price = Number(item.price).toLocaleString();
+                    const imageSrc = item.image || 'https://via.placeholder.com/150?text=Skymoon';
+                    // انیمیشن تاخیردار
+                    const delay = index * 50; 
+
                     const html = `
-                    <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition animate-fade-in" data-category="${item.category}">
-                        <div class="w-24 h-24 rounded overflow-hidden ml-4 flex-shrink-0 bg-gray-700">
-                             <img src="${imageSrc}" class="w-full h-full object-cover" alt="${item.name}">
+                    <div class="flex bg-dark-800 rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/50 transition shadow-lg group animate-fade-in" style="animation-delay: ${delay}ms">
+                        <div class="w-32 h-32 flex-shrink-0 bg-gray-700 relative overflow-hidden">
+                             <img src="${imageSrc}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${item.name}">
                         </div>
-                        <div class="flex flex-col justify-between w-full">
+                        <div class="flex flex-col justify-between w-full p-4">
                             <div>
-                                <h3 class="text-lg font-bold text-white">${item.name}</h3>
-                                <p class="text-xs text-gray-400 mt-1">${item.description || ''}</p>
+                                <div class="flex justify-between items-start">
+                                    <h3 class="text-lg font-bold text-white group-hover:text-gold-500 transition">${item.name}</h3>
+                                    ${item.is_featured ? '<i class="fas fa-star text-gold-500 text-xs animate-pulse" title="پیشنهاد ویژه"></i>' : ''}
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1 line-clamp-2">${item.description || ''}</p>
                             </div>
-                            <div class="text-left text-gold-500 font-bold">${price} تومان</div>
+                            <div class="flex justify-between items-end mt-2">
+                                <span class="text-xs bg-dark-900 text-gray-500 px-2 py-1 rounded border border-white/5">${item.category}</span>
+                                <div class="text-gold-500 font-bold text-lg dir-ltr">${price} <small class="text-xs font-normal">تومان</small></div>
+                            </div>
                         </div>
                     </div>
                     `;
                     menuGrid.innerHTML += html;
                 });
-
-                setupTabs(); // فعال‌سازی تب‌ها روی آیتم‌های جدید
             }
 
-            // 3. سیستم تب‌ها (فیلترینگ)
-            function setupTabs() {
-                const tabs = document.querySelectorAll('.menu-tab');
-                const items = document.querySelectorAll('.menu-item');
-
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        // مدیریت کلاس اکتیو دکمه‌ها
-                        tabs.forEach(t => {
-                            t.classList.remove('bg-gold-500', 'text-dark-900');
-                            t.classList.add('bg-dark-800', 'text-gray-300');
-                        });
-                        tab.classList.remove('bg-dark-800', 'text-gray-300');
-                        tab.classList.add('bg-gold-500', 'text-dark-900');
-
-                        // فیلتر کردن
-                        const target = tab.getAttribute('data-target');
-                        items.forEach(item => {
-                            if (target === 'all' || item.getAttribute('data-category') === target) {
-                                item.classList.remove('hidden');
-                                item.classList.add('flex');
-                            } else {
-                                item.classList.add('hidden');
-                                item.classList.remove('flex');
-                            }
-                        });
-                    });
-                });
-            }
-
-            // شروع فرآیند
+            // اجرا
             await fetchMenu();
         });
     </script>
