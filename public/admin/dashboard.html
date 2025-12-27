@@ -18,6 +18,7 @@
         <nav class="flex-1 p-4 space-y-2">
             <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-calendar-alt ml-3"></i>رزروهای رسیده</button>
             <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-utensils ml-3"></i>مدیریت منو</button>
+            <button onclick="switchTab('gallery')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-images ml-3"></i>مدیریت گالری</button>
             <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-paint-brush ml-3"></i>تغییر تم سایت</button>
         </nav>
         <div class="p-4">
@@ -47,7 +48,7 @@
                 <table class="w-full text-right">
                     <thead class="bg-gray-700 text-yellow-500">
                         <tr>
-                            <th class="p-4">نام آیتم</th>
+                            <th class="p-4">تصویر</th> <th class="p-4">نام آیتم</th>
                             <th class="p-4">دسته‌بندی</th>
                             <th class="p-4">قیمت</th>
                             <th class="p-4">عملیات</th>
@@ -57,6 +58,29 @@
                         </tbody>
                 </table>
             </div>
+        </section>
+
+        <section id="gallery-section" class="tab-content hidden">
+            <div class="bg-gray-800 p-6 rounded-lg mb-8 border border-gray-700">
+                <h2 class="text-xl font-bold text-yellow-500 mb-4">افزودن تصویر به گالری</h2>
+                <p class="text-xs text-gray-500 mb-4">لینک مستقیم تصویر را وارد کنید (URL).</p>
+                
+                <form id="uploadGalleryForm" class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="w-full">
+                        <label class="block text-gray-400 text-sm mb-2">لینک تصویر</label>
+                        <input type="url" id="galleryUrl" placeholder="https://..." required class="w-full bg-gray-900 text-white rounded p-2 text-sm border border-gray-700 text-left" dir="ltr">
+                    </div>
+                    <div class="w-full">
+                         <label class="block text-gray-400 text-sm mb-2">توضیح (اختیاری)</label>
+                         <input type="text" id="galleryCaption" placeholder="مثلاً: فضای تولد" class="w-full bg-gray-900 text-white rounded p-2 border border-gray-700 focus:border-yellow-500 outline-none">
+                    </div>
+                    <button type="submit" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2.5 rounded font-bold whitespace-nowrap transition h-fit">افزودن</button>
+                </form>
+            </div>
+        
+            <h3 class="text-2xl font-bold text-white mb-4 border-b border-gray-700 pb-2">تصاویر موجود</h3>
+            <div id="gallery-admin-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                </div>
         </section>
 
         <section id="theme-section" class="tab-content hidden">
@@ -90,6 +114,8 @@
                 <input type="text" id="itemName" placeholder="نام غذا/نوشیدنی" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
                 <input type="text" id="itemCategory" placeholder="دسته‌بندی (مثلاً: coffee)" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
                 <input type="number" id="itemPrice" placeholder="قیمت (به تومان)" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
+                <input type="url" id="itemImage" placeholder="لینک تصویر (اختیاری)" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-transparent focus:border-yellow-500" dir="ltr">
+                
                 <textarea id="itemDesc" placeholder="مواد تشکیل‌دهنده..." class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent"></textarea>
                 <div class="flex justify-end gap-2 mt-4">
                     <button type="button" onclick="document.getElementById('addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
@@ -109,12 +135,12 @@
         // خروج
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if(confirm('آیا می‌خواهید خارج شوید؟')) {
-                window.location.href = '../index.html'; // یا صفحه لاگین
+                window.location.href = '../index.html';
             }
         });
 
         // =========================================================
-        // ۲. مدیریت رزروها (دریافت از سرور Node.js)
+        // ۲. مدیریت رزروها
         // =========================================================
         async function loadReservations() {
             const container = document.getElementById('reservations-list');
@@ -135,6 +161,7 @@
                             <h3 class="font-bold text-lg text-white mb-2">${item.name}</h3>
                             <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-2 text-yellow-600"></i> ${item.date} | ساعت ${item.time}</p>
                             <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-2 text-yellow-600"></i> ${item.guests}</p>
+                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-couch ml-2 text-yellow-600"></i> ${item.space || 'تعیین نشده'}</p>
                             <p class="text-gray-400 text-sm mb-3"><i class="fas fa-phone ml-2 text-yellow-600"></i> ${item.phone}</p>
                             <div class="flex justify-end mt-2 border-t border-gray-700 pt-2">
                                 <button onclick="deleteRes('${item._id}')" class="text-red-400 text-sm hover:text-red-200 transition flex items-center gap-1"><i class="fas fa-trash"></i> حذف رزرو</button>
@@ -153,13 +180,13 @@
             if(confirm('آیا مطمئن هستید که می‌خواهید این رزرو را حذف کنید؟')) {
                 try {
                     await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
-                    loadReservations(); // بروزرسانی لیست
+                    loadReservations();
                 } catch (e) { alert('خطا در حذف'); }
             }
         }
 
         // =========================================================
-        // ۳. مدیریت منو (دریافت از سرور)
+        // ۳. مدیریت منو (با پشتیبانی از تصویر)
         // =========================================================
         async function loadMenu() {
             const tableBody = document.getElementById('menu-table-body');
@@ -170,8 +197,14 @@
                 tableBody.innerHTML = '';
                 list.forEach(item => {
                     const formattedPrice = Number(item.price).toLocaleString();
+                    // اگر عکس نداشت، placeholder بذار
+                    const imgUrl = item.image || 'https://via.placeholder.com/50';
+                    
                     const row = `
                         <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                            <td class="p-4">
+                                <img src="${imgUrl}" class="w-10 h-10 rounded object-cover bg-gray-600">
+                            </td>
                             <td class="p-4 font-bold text-white">${item.name}</td>
                             <td class="p-4 text-sm text-gray-400">${item.category}</td>
                             <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
@@ -182,9 +215,7 @@
                     `;
                     tableBody.innerHTML += row;
                 });
-            } catch (error) {
-                console.error(error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         // افزودن آیتم جدید
@@ -194,7 +225,8 @@
                 name: document.getElementById('itemName').value,
                 category: document.getElementById('itemCategory').value,
                 price: document.getElementById('itemPrice').value,
-                description: document.getElementById('itemDesc').value
+                description: document.getElementById('itemDesc').value,
+                image: document.getElementById('itemImage').value // دریافت لینک تصویر
             };
 
             try {
@@ -207,7 +239,7 @@
                 if(res.ok) {
                     document.getElementById('addMenuModal').classList.add('hidden');
                     e.target.reset();
-                    loadMenu(); // بروزرسانی لیست
+                    loadMenu();
                     alert('آیتم با موفقیت اضافه شد!');
                 }
             } catch(e) { alert('خطا در ذخیره'); }
@@ -223,7 +255,82 @@
         }
 
         // =========================================================
-        // ۴. تنظیمات تم
+        // ۴. مدیریت گالری (جدید)
+        // =========================================================
+        async function loadGallery() {
+            const grid = document.getElementById('gallery-admin-grid');
+            grid.innerHTML = '<p class="text-gray-500">در حال دریافت...</p>';
+            
+            try {
+                const res = await fetch('/api/gallery');
+                const images = await res.json();
+                grid.innerHTML = '';
+                
+                if(images.length === 0) {
+                    grid.innerHTML = '<p class="text-gray-500 col-span-full">عکسی در گالری موجود نیست</p>';
+                    return;
+                }
+
+                images.forEach(img => {
+                    const safeImg = img.image || 'https://via.placeholder.com/150';
+
+                    grid.innerHTML += `
+                        <div class="relative group rounded overflow-hidden border border-gray-700 aspect-square bg-black">
+                            <img src="${safeImg}" class="w-full h-full object-cover">
+                            <button onclick="deleteGalleryImage('${img._id}')" class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-500 transition shadow-lg opacity-80 group-hover:opacity-100"><i class="fas fa-trash"></i></button>
+                            <div class="absolute bottom-0 left-0 w-full bg-black/60 p-2 text-xs text-center truncate">${img.caption || ''}</div>
+                        </div>
+                    `;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // افزودن عکس به گالری
+        document.getElementById('uploadGalleryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.innerText = '...';
+            submitBtn.disabled = true;
+
+            const newImage = {
+                image: document.getElementById('galleryUrl').value,
+                caption: document.getElementById('galleryCaption').value
+            };
+
+            try {
+                const res = await fetch('/api/gallery', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newImage)
+                });
+                
+                if(res.ok) {
+                    alert('عکس به گالری اضافه شد');
+                    document.getElementById('galleryUrl').value = '';
+                    document.getElementById('galleryCaption').value = '';
+                    loadGallery();
+                } else {
+                    alert('خطا در ذخیره');
+                }
+            } catch(err) {
+                console.error(err);
+                alert('خطای سرور');
+            } finally {
+                submitBtn.innerText = 'افزودن';
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.deleteGalleryImage = async (id) => {
+            if(confirm('این عکس از گالری حذف شود؟')) {
+                await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+                loadGallery();
+            }
+        };
+
+        // =========================================================
+        // ۵. تنظیمات تم
         // =========================================================
         async function loadThemeSettings() {
             try {
@@ -252,16 +359,15 @@
             alert('تم جدید اعمال شد! سایت اصلی را چک کنید.');
         });
 
-        // هماهنگی اینپوت‌های رنگ
         document.getElementById('primaryColorPicker').addEventListener('input', (e) => document.getElementById('primaryColorText').value = e.target.value);
         document.getElementById('bgColorPicker').addEventListener('input', (e) => document.getElementById('bgColorText').value = e.target.value);
 
         // =========================================================
         // اجرای اولیه (Initial Load)
         // =========================================================
-        // وقتی صفحه لود شد، اطلاعات را بگیر
         loadReservations();
         loadMenu();
+        loadGallery();
         loadThemeSettings();
 
     </script>
