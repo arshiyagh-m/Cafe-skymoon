@@ -17,12 +17,12 @@ const pool = new Pool({
   ssl: false // غیرفعال کردن SSL برای اتصال درون‌شبکه‌ای لیارا
 });
 
-// --- ایجاد جدول‌ها (اگر وجود نداشته باشند) ---
+// --- ایجاد و تعمیر جدول‌ها ---
 const initDB = async () => {
     try {
         const client = await pool.connect();
         
-        // 1. جدول منو (با فیلد ویژه is_featured)
+        // 1. ساخت جدول منو (اگر وجود نداشته باشد)
         await client.query(`
             CREATE TABLE IF NOT EXISTS menu (
                 id SERIAL PRIMARY KEY,
@@ -30,12 +30,16 @@ const initDB = async () => {
                 category TEXT NOT NULL,
                 price NUMERIC NOT NULL,
                 description TEXT,
-                image TEXT,
-                is_featured BOOLEAN DEFAULT FALSE
+                image TEXT
             );
         `);
 
-        // 2. جدول گالری
+        // 2. *** بخش تعمیر دیتابیس *** // این دستور تضمین می‌کند که اگر جدول از قبل بود ولی ستون is_featured را نداشت، آن را اضافه کند
+        await client.query(`
+            ALTER TABLE menu ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+        `);
+
+        // 3. جدول گالری
         await client.query(`
             CREATE TABLE IF NOT EXISTS gallery (
                 id SERIAL PRIMARY KEY,
@@ -45,7 +49,7 @@ const initDB = async () => {
             );
         `);
 
-        // 3. جدول رزرو
+        // 4. جدول رزرو
         await client.query(`
             CREATE TABLE IF NOT EXISTS reservations (
                 id SERIAL PRIMARY KEY,
@@ -60,7 +64,7 @@ const initDB = async () => {
             );
         `);
 
-        // 4. جدول تنظیمات
+        // 5. جدول تنظیمات
         await client.query(`
             CREATE TABLE IF NOT EXISTS settings (
                 key TEXT PRIMARY KEY,
@@ -68,7 +72,7 @@ const initDB = async () => {
             );
         `);
 
-        console.log('✅ PostgreSQL Tables checked/created successfully');
+        console.log('✅ Database tables verified and patched successfully');
         client.release();
     } catch (err) {
         console.error('❌ Error initializing database:', err);
@@ -96,12 +100,16 @@ app.get('/api/menu', async (req, res) => {
 app.post('/api/menu', async (req, res) => {
     try {
         const { name, category, price, description, image } = req.body;
+        // مقدار پیش‌فرض is_featured را false می‌گذاریم
         const result = await pool.query(
             'INSERT INTO menu (name, category, price, description, image, is_featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
             [name, category, price, description, image, false]
         );
         res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e) { 
+        console.error(e);
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 // ویرایش کامل آیتم
@@ -118,11 +126,10 @@ app.put('/api/menu/:id', async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ** جدید: تغییر وضعیت ستاره (Toggle Featured) **
+// تغییر وضعیت ستاره (Toggle Featured)
 app.patch('/api/menu/:id/toggle-feature', async (req, res) => {
     try {
         const { id } = req.params;
-        // مقدار is_featured را برعکس می‌کند (true -> false و برعکس)
         const result = await pool.query(
             'UPDATE menu SET is_featured = NOT is_featured WHERE id = $1 RETURNING *',
             [id]
@@ -198,7 +205,6 @@ app.get('/api/theme', async (req, res) => {
         if (result.rows.length > 0) {
             res.json(result.rows[0].value);
         } else {
-            // مقادیر پیش‌فرض کامل
             res.json({ primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
         }
     } catch (e) { res.status(500).json({ error: e.message }); }
@@ -207,7 +213,6 @@ app.get('/api/theme', async (req, res) => {
 app.post('/api/theme', async (req, res) => {
     try {
         const value = req.body;
-        // Upsert برای Postgres
         await pool.query(
             `INSERT INTO settings (key, value) VALUES ('theme', $1) 
              ON CONFLICT (key) DO UPDATE SET value = $1`,
