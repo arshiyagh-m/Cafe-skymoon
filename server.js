@@ -10,12 +10,11 @@ app.use(cors());
 app.use(express.static('public'));
 
 // --- اتصال به دیتابیس PostgreSQL ---
-// نکته: در لیارا متغیر محیطی DATABASE_URL را تنظیم کنید.
 const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/skymoon';
 
 const pool = new Pool({
   connectionString: connectionString,
-  ssl: false // <--- تغییر مهم: SSL را کلا خاموش کردیم
+  ssl: false // غیرفعال کردن SSL برای اتصال درون‌شبکه‌ای لیارا
 });
 
 // --- ایجاد جدول‌ها (اگر وجود نداشته باشند) ---
@@ -75,12 +74,11 @@ const initDB = async () => {
     }
 };
 
-// اجرای تابع ساخت جدول‌ها در لحظه شروع
 initDB();
 
 
 // =========================================================
-// API Routes (مسیرهای ارتباطی با SQL)
+// API Routes
 // =========================================================
 
 // --- مدیریت منو ---
@@ -97,6 +95,20 @@ app.post('/api/menu', async (req, res) => {
         const result = await pool.query(
             'INSERT INTO menu (name, category, price, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [name, category, price, description, image]
+        );
+        res.json(result.rows[0]);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ** روت جدید: ویرایش آیتم منو **
+app.put('/api/menu/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, category, price, description, image } = req.body;
+        
+        const result = await pool.query(
+            'UPDATE menu SET name=$1, category=$2, price=$3, description=$4, image=$5 WHERE id=$6 RETURNING *',
+            [name, category, price, description, image, id]
         );
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
@@ -168,7 +180,8 @@ app.get('/api/theme', async (req, res) => {
         if (result.rows.length > 0) {
             res.json(result.rows[0].value);
         } else {
-            res.json({ primary: '#d4af37', bg: '#0f0f0f' });
+            // مقادیر پیش‌فرض کامل
+            res.json({ primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
         }
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -176,7 +189,6 @@ app.get('/api/theme', async (req, res) => {
 app.post('/api/theme', async (req, res) => {
     try {
         const value = req.body;
-        // Upsert برای Postgres
         await pool.query(
             `INSERT INTO settings (key, value) VALUES ('theme', $1) 
              ON CONFLICT (key) DO UPDATE SET value = $1`,
