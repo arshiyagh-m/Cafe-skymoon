@@ -9,6 +9,8 @@
     
     <link rel="stylesheet" href="assets/css/style.css">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,7 +22,7 @@
                     colors: {
                         gold: {
                             400: '#fbbf24',
-                            500: 'var(--primary-color)', // رنگ داینامیک
+                            500: 'var(--primary-color)', // اتصال به تم داینامیک
                             600: '#b4942b',
                         },
                         dark: {
@@ -35,7 +37,7 @@
     <style>
         /* مقادیر پیش‌فرض */
         :root { --primary-color: #d4af37; }
-        body { background-color: #0f0f0f; color: #f3f4f6; }
+        body { background-color: #0f0f0f; color: #f3f4f6; overflow-x: hidden; }
         .text-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
         
         /* انیمیشن‌ها */
@@ -43,9 +45,9 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+<body class="font-sans leading-relaxed flex flex-col min-h-screen relative">
 
-    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10 transition-colors duration-500">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2">
                 <img src="assets/img/logo.jpg" alt="Skymoon Logo" class="h-12 w-12 rounded-full object-cover border border-gold-500">
@@ -102,36 +104,27 @@
             <h2 class="text-3xl text-gold-500 mb-10 text-center font-bold border-b border-gold-500/30 pb-4 inline-block mx-auto flex w-fit">پیشنهاد سرآشپز</h2>
             
             <div id="specials-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                
                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden bg-gray-800">
-                        <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-50">
-                    </div>
+                    <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">در حال بارگذاری...</h3>
+                        <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
                         <div class="h-4 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
                     </div>
                 </div>
-
                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden bg-gray-800">
-                         <img src="https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-50">
-                    </div>
+                    <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">در حال بارگذاری...</h3>
+                        <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
                         <div class="h-4 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
                     </div>
                 </div>
-                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden bg-gray-800">
-                         <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-50">
-                    </div>
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
+                    <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">در حال بارگذاری...</h3>
+                        <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
                         <div class="h-4 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -153,7 +146,7 @@
         </div>
     </section>
 
-    <footer class="bg-black py-10 border-t border-white/10 mt-auto">
+    <footer class="bg-black py-10 border-t border-white/10 mt-auto relative z-10">
         <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-right">
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
@@ -174,7 +167,7 @@
         </div>
         <div class="text-center text-gray-600 text-xs mt-10 border-t border-white/5 pt-4 flex justify-between items-center px-4">
             <p>&copy; 2024 Skymoon Cafe.</p>
-            <a href="admin/login.html" class="text-gray-700 hover:text-gold-500 transition">مدیریت</a>
+            <a href="admin/dashboard.html" class="text-gray-700 hover:text-gold-500 transition">مدیریت</a>
         </div>
     </footer>
 
@@ -185,16 +178,34 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             
-            // 1. دریافت تم داینامیک
+            // -----------------------------------------------------------
+            // 1. دریافت تم و اعمال افکت‌های مناسبتی (Christmas, Yalda, ...)
+            // -----------------------------------------------------------
             try {
                 const res = await fetch('/api/theme');
                 if(res.ok) {
                     const theme = await res.json();
+                    
+                    // تغییر رنگ اصلی
                     document.documentElement.style.setProperty('--primary-color', theme.primary);
+
+                    // اعمال افکت‌های مناسبتی
+                    if (theme.occasion === 'christmas') {
+                        createSnowEffect();
+                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/622/622838.png'); // Gift Icon
+                    } else if (theme.occasion === 'yalda') {
+                        createRedTheme();
+                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/4062/4062916.png'); // Pomegranate Icon
+                    } else if (theme.occasion === 'nowruz') {
+                        createSpringEffect();
+                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/2869/2869442.png'); // Flower Icon
+                    }
                 }
             } catch(e) { console.log('Using Default Theme'); }
 
+            // -----------------------------------------------------------
             // 2. مدیریت منوی موبایل
+            // -----------------------------------------------------------
             const menuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
 
@@ -204,7 +215,9 @@
                 });
             }
 
-            // 3. دریافت پیشنهادات سرآشپز (۳ آیتم اول از دیتابیس)
+            // -----------------------------------------------------------
+            // 3. دریافت پیشنهادات سرآشپز (از دیتابیس)
+            // -----------------------------------------------------------
             const specialsGrid = document.getElementById('specials-grid');
             try {
                 const menuRes = await fetch('/api/menu');
@@ -214,70 +227,116 @@
                     if(menuItems.length > 0) {
                         specialsGrid.innerHTML = ''; // حذف لودینگ
                         
-                        // انتخاب ۳ آیتم اول (یا رندوم)
+                        // انتخاب ۳ آیتم اول
                         const featured = menuItems.slice(0, 3);
                         
                         featured.forEach(item => {
                             const price = Number(item.price).toLocaleString();
-                            // اگر عکس نداشت، یک عکس پیش فرض بر اساس دسته‌بندی یا عمومی
                             const imgSrc = item.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600';
                             
                             const html = `
                                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300 h-full flex flex-col">
-                                    <div class="h-48 overflow-hidden bg-gray-800">
+                                    <div class="h-48 overflow-hidden bg-gray-800 relative">
                                         <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${item.name}">
+                                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition"></div>
                                     </div>
                                     <div class="p-6 flex flex-col flex-grow">
                                         <h3 class="text-xl font-bold text-white mb-2">${item.name}</h3>
-                                        <p class="text-sm text-gray-400 mb-4 flex-grow">${item.description || item.category}</p>
-                                        <span class="text-gold-500 font-bold text-lg text-left dir-ltr">${price} تومان</span>
+                                        <p class="text-sm text-gray-400 mb-4 flex-grow line-clamp-2">${item.description || item.category}</p>
+                                        <div class="flex justify-between items-center mt-auto">
+                                            <span class="text-gold-500 font-bold text-lg dir-ltr">${price} تومان</span>
+                                            <a href="menu.html" class="text-xs text-gray-500 hover:text-white transition">مشاهده</a>
+                                        </div>
                                     </div>
                                 </div>
                             `;
                             specialsGrid.innerHTML += html;
                         });
                     } else {
-                        // اگر منو خالی بود، پیام ندهد، همان آیتم‌های استاتیک HTML باقی بماند یا پاک شود
-                        // در اینجا بهتر است اگر دیتابیس خالی است، Fallback را پاک کرده و پیام دهد
-                        specialsGrid.innerHTML = '<p class="col-span-3 text-center text-gray-500">منوی پیشنهادی فعلا در دسترس نیست.</p>';
+                        // فال‌بک (اگر دیتابیس خالی بود)
+                        specialsGrid.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-10 border border-white/5 rounded-lg">منوی پیشنهادی به زودی اضافه می‌شود...</p>';
                     }
                 }
             } catch (e) {
                 console.error("Error fetching specials:", e);
-                // در صورت خطا، لودینگ‌ها باقی می‌مانند یا می‌توان آنها را با محتوای استاتیک جایگزین کرد
-                // برای زیبایی بیشتر، اگر خطا خورد، ۳ آیتم نمونه (استاتیک) را جایگزین می‌کنیم:
+                // اگر سرور قطع بود، فال‌بک استاتیک نشان بده
                 specialsGrid.innerHTML = `
                  <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">چیکن آلفردو</h3>
-                        <p class="text-sm text-gray-400 mb-4">پاستا پنه، سینه مرغ گریل، سس آلفردو مخصوص</p>
-                        <span class="text-gold-500 font-bold text-lg">۲۴۵,۰۰۰ تومان</span>
-                    </div>
-                </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">لته آرت</h3>
-                        <p class="text-sm text-gray-400 mb-4">اسپرسو ۱۰۰٪ عربیکا، شیر فوم‌دار تازه</p>
-                        <span class="text-gold-500 font-bold text-lg">۹۵,۰۰۰ تومان</span>
-                    </div>
-                </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">رست بیف مخصوص</h3>
-                        <p class="text-sm text-gray-400 mb-4">گوشت گوساله رست شده، سس قارچ، پنیر گودا</p>
-                        <span class="text-gold-500 font-bold text-lg">۲۹۰,۰۰۰ تومان</span>
-                    </div>
+                    <div class="h-48 overflow-hidden"><img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600" class="w-full h-full object-cover"></div>
+                    <div class="p-6"><h3 class="text-xl font-bold text-white mb-2">چیکن آلفردو</h3><span class="text-gold-500 font-bold">۲۴۵,۰۰۰ تومان</span></div>
                 </div>
                 `;
+            }
+
+            // -----------------------------------------------------------
+            // 4. توابع افکت‌های مناسبتی (CSS Injection)
+            // -----------------------------------------------------------
+            
+            // الف) افکت برف (CSS + JS Loop)
+            function createSnowEffect() {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .snowflake { position: fixed; top: -10px; color: #fff; font-size: 1.2em; animation: fall linear infinite; z-index: 9999; pointer-events: none; text-shadow: 0 0 5px #fff; }
+                    @keyframes fall { to { transform: translateY(105vh); } }
+                `;
+                document.head.appendChild(style);
+                
+                setInterval(() => {
+                    const flake = document.createElement('div');
+                    flake.classList.add('snowflake');
+                    flake.innerText = '❄';
+                    flake.style.left = Math.random() * 100 + 'vw';
+                    flake.style.animationDuration = Math.random() * 3 + 4 + 's'; // سرعت آهسته
+                    flake.style.opacity = Math.random() * 0.7 + 0.3;
+                    document.body.appendChild(flake);
+                    setTimeout(() => flake.remove(), 7000);
+                }, 300);
+            }
+
+            // ب) افکت تم قرمز (یلدا)
+            function createRedTheme() {
+                // اورراید کردن رنگ اصلی
+                document.documentElement.style.setProperty('--primary-color', '#e11d48'); 
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    body { background: radial-gradient(circle at center, #2a0a10 0%, #000000 100%) !important; }
+                    .border-gold-500 { border-color: #e11d48 !important; }
+                    .text-gold-500 { color: #e11d48 !important; }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // ج) افکت بهار (نوروز)
+            function createSpringEffect() {
+                document.documentElement.style.setProperty('--primary-color', '#10b981'); // سبز بهاری
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .flower { position: fixed; top: -10px; font-size: 1.5em; animation: fallRotate linear infinite; z-index: 9999; pointer-events: none; }
+                    @keyframes fallRotate { to { transform: translateY(105vh) rotate(360deg); } }
+                `;
+                document.head.appendChild(style);
+                setInterval(() => {
+                    const f = document.createElement('div');
+                    f.classList.add('flower');
+                    f.innerText = '🌸'; // یا 🍃
+                    f.style.left = Math.random() * 100 + 'vw';
+                    f.style.animationDuration = Math.random() * 5 + 4 + 's';
+                    document.body.appendChild(f);
+                    setTimeout(() => f.remove(), 9000);
+                }, 600);
+            }
+
+            // د) افزودن آیکون گوشه (گیفت/انار)
+            function addCornerDecoration(iconUrl) {
+                const img = document.createElement('img');
+                img.src = iconUrl;
+                img.style.cssText = "position: fixed; bottom: 80px; right: 20px; width: 60px; z-index: 100; animation: bounce 3s infinite ease-in-out; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); cursor: pointer;";
+                img.title = "تبریک مناسبت!";
+                document.body.appendChild(img);
+                
+                const style = document.createElement('style');
+                style.innerHTML = `@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }`;
+                document.head.appendChild(style);
             }
         });
     </script>
