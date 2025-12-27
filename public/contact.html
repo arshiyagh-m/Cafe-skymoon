@@ -1,36 +1,164 @@
-<main class="mt-24 container mx-auto px-4 mb-16">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div class="space-y-8">
-            <div>
-                <h1 class="text-3xl text-gold-500 font-bold mb-4">تماس با کافه اسکای مون</h1>
-                <p class="text-gray-300"><i class="fas fa-clock ml-2 text-gold-500"></i>ساعات کاری: ۱۱:۰۰ صبح الی ۲۳:۳۰ شب</p>
-                <p class="text-gray-300 mt-2"><i class="fas fa-phone ml-2 text-gold-500"></i>۰۹۱۹۴۳۵۸۴۰۰</p>
-                <p class="text-gray-300 mt-2"><i class="fas fa-map-pin ml-2 text-gold-500"></i>میاندوآب، کوی سعادت، روبروی جهاد</p>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تماس با ما | کافه اسکای مون</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+                    colors: {
+                        gold: { 500: 'var(--primary-color)', 400: '#fbbf24' }, // رنگ داینامیک
+                        dark: { 900: '#0f0f0f', 800: '#1a1a1a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root { --primary-color: #d4af37; }
+        body { background-color: #0f0f0f; color: #f3f4f6; }
+    </style>
+</head>
+<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-xl font-bold text-gold-500 tracking-wide">کافه اسکای مون</span>
+            </a>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="index.html" class="hover:text-gold-500 transition">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500 transition">منو</a>
+                <a href="reservation.html" class="hover:text-gold-500 transition">رزرو میز</a>
+                <a href="gallery.html" class="hover:text-gold-500 transition">گالری</a>
+                <a href="contact.html" class="text-gold-500">تماس با ما</a>
+            </nav>
+            <button id="mobile-menu-btn" class="md:hidden text-2xl text-gold-500 focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-800 border-t border-white/10">
+            <div class="flex flex-col p-4 space-y-3 text-center">
+                <a href="index.html" class="text-gold-500">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500">منو</a>
+                <a href="reservation.html" class="hover:text-gold-500">رزرو میز</a>
+                <a href="contact.html" class="hover:text-gold-500">تماس با ما</a>
             </div>
+        </div>
+    </header>
+
+    <main class="mt-24 container mx-auto px-4 mb-16 flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
             
-            <div class="bg-dark-800 p-5 rounded border-r-4 border-gold-500">
-                <h3 class="text-xl text-white font-bold mb-2"><i class="fas fa-motorcycle ml-2"></i>دلیوری</h3>
-                <p class="text-gray-400 text-sm">ارسال در محدوده ۱۰ کیلومتری شعبه امکان‌پذیر است. هزینه ارسال بسته به مسافت متغیر می‌باشد.</p>
+            <div class="space-y-8">
+                <div>
+                    <h1 class="text-3xl text-gold-500 font-bold mb-4">تماس با کافه اسکای مون</h1>
+                    <p class="text-gray-300 mb-2"><i class="fas fa-clock ml-2 text-gold-500"></i>ساعات کاری: ۱۱:۰۰ صبح الی ۲۳:۳۰ شب</p>
+                    
+                    <p class="text-gray-300 mt-2 flex items-center">
+                        <i class="fas fa-phone-alt ml-2 text-gold-500"></i>
+                        <span dir="ltr" class="text-right">044-45242793</span>
+                    </p>
+                    <p class="text-gray-300 mt-2 flex items-center">
+                        <i class="fas fa-mobile-alt ml-2 text-gold-500"></i>
+                        <span dir="ltr" class="text-right">0914-481-9583</span>
+                    </p>
+                    
+                    <p class="text-gray-300 mt-2"><i class="fas fa-map-pin ml-2 text-gold-500"></i>آذربایجان غربی،شهرستان میاندوآب،کوی سعادت،بالاتر از فضای سبز،نرسیده به جهاد کشاورزی کافه رستوران اسکای مون</p>
+                </div>
+                
+                <div class="bg-dark-800 p-5 rounded border-r-4 border-gold-500">
+                    <h3 class="text-xl text-white font-bold mb-2"><i class="fas fa-motorcycle ml-2"></i>دلیوری</h3>
+                    <p class="text-gray-400 text-sm">ارسال در محدوده ۱۰ کیلومتری شعبه امکان‌پذیر است. هزینه ارسال بسته به مسافت متغیر می‌باشد.</p>
+                </div>
+    
+                <div class="w-full h-64 bg-gray-700 rounded-lg overflow-hidden relative border border-white/10">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d51675.67660292728!2d46.077!3d36.969!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x401a44e66601f705%3A0x6e9a039100416b9!2sMiandoab%2C%20West%20Azerbaijan%20Province%2C%20Iran!5e0!3m2!1sen!2s!4v1703670000000!5m2!1sen!2s" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
             </div>
-
-            <div class="w-full h-64 bg-gray-700 rounded-lg overflow-hidden relative">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3183.123456789!2d46.1!3d36.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDU4JzAwLjAiTiA0NsKwMDYnMDAuMCJF!5e0!3m2!1sen!2sir!4v1600000000000!5m2!1sen!2sir" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    
+            <div class="bg-dark-800 p-8 rounded-lg shadow-lg border border-white/5 h-fit">
+                <h2 class="text-2xl text-white font-bold mb-6">پیام به مدیریت</h2>
+                <form id="contact-form" class="space-y-4">
+                    <input type="text" id="contact-name" placeholder="نام شما" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                    <input type="tel" id="contact-phone" placeholder="شماره تماس" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                    <select id="contact-subject" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition">
+                        <option>پیشنهاد</option>
+                        <option>انتقاد / شکایت</option>
+                        <option>پیگیری رزرو</option>
+                    </select>
+                    <textarea id="contact-message" rows="5" placeholder="متن پیام..." required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition"></textarea>
+                    <button type="submit" class="w-full bg-gold-500 text-dark-900 font-bold py-3 rounded hover:bg-gold-400 transition flex justify-center items-center">ارسال پیام</button>
+                </form>
             </div>
         </div>
+    </main>
 
-        <div class="bg-dark-800 p-8 rounded-lg shadow-lg">
-            <h2 class="text-2xl text-white font-bold mb-6">پیام به مدیریت</h2>
-            <form id="contact-form" class="space-y-4">
-                <input type="text" placeholder="نام شما" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none">
-                <input type="tel" placeholder="شماره تماس" class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none">
-                <select class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none">
-                    <option>پیشنهاد</option>
-                    <option>انتقاد / شکایت</option>
-                    <option>پیگیری رزرو</option>
-                </select>
-                <textarea rows="5" placeholder="متن پیام..." class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none"></textarea>
-                <button type="submit" class="w-full bg-gold-500 text-dark-900 font-bold py-3 rounded hover:bg-gold-400 transition">ارسال پیام</button>
-            </form>
+    <footer class="bg-black py-8 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
+            <p class="text-gray-500 text-sm mb-4">راه‌های ارتباطی ما همیشه باز است</p>
+            <div class="text-gray-600 text-xs">
+                © 2024
+            </div>
         </div>
-    </div>
-</main>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // 1. دریافت تم داینامیک
+            try {
+                const res = await fetch('/api/theme');
+                if(res.ok) {
+                    const theme = await res.json();
+                    document.documentElement.style.setProperty('--primary-color', theme.primary);
+                }
+            } catch(e) { console.log('Using Default Theme'); }
+
+            // 2. منوی موبایل
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(menuBtn) {
+                menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            }
+
+            // 3. هندل کردن فرم تماس
+            const form = document.getElementById('contact-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = form.querySelector('button');
+                const originalText = btn.innerText;
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال ارسال...';
+                
+                // شبیه‌سازی ارسال (یا بعداً می‌توانید به API متصل کنید)
+                setTimeout(() => {
+                    alert('پیام شما با موفقیت ارسال شد. ممنون از تماس شما!');
+                    form.reset();
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
