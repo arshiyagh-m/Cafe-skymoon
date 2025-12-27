@@ -79,7 +79,7 @@
         </div>
     </header>
 
-    <section class="relative h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat bg-fixed mt-16">
+    <section id="hero-section" class="relative h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat bg-fixed mt-16 transition-all duration-1000">
         <div class="absolute inset-0 bg-black/60"></div>
         <div class="relative z-10 text-center px-4 animate-fade-in">
             <img src="assets/img/logo.jpg" class="h-24 w-24 mx-auto mb-4 rounded-full border-2 border-gold-500 shadow-lg" alt="Logo">
@@ -104,21 +104,21 @@
             <h2 class="text-3xl text-gold-500 mb-10 text-center font-bold border-b border-gold-500/30 pb-4 inline-block mx-auto flex w-fit">پیشنهاد سرآشپز</h2>
             
             <div id="specials-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5">
                     <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
                         <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
                         <div class="h-4 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
                     </div>
                 </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5">
                     <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
                         <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
                         <div class="h-4 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
                     </div>
                 </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5">
                     <div class="h-48 overflow-hidden bg-gray-800"><div class="w-full h-full animate-pulse bg-gray-700"></div></div>
                     <div class="p-6">
                         <div class="h-6 bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
@@ -154,14 +154,13 @@
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">تماس با ما</h3>
-                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-map-marker-alt ml-2 text-gold-500"></i>آذربایجان غربی،شهرستان میاندوآب،کوی سعادت،بالاتر از فضای سبز،نرسیده به جهاد کشاورزی کافه رستوران اسکای مون</p>
+                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-map-marker-alt ml-2 text-gold-500"></i>آذربایجان غربی، شهرستان میاندوآب، کوی سعادت، بالاتر از فضای سبز، نرسیده به جهاد کشاورزی کافه رستوران اسکای مون</p>
                 <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-phone ml-2 text-gold-500"></i>044-45242793</p>
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">شبکه‌های اجتماعی</h3>
                 <div class="flex justify-center md:justify-start gap-4">
                     <a href="https://www.instagram.com/cafe.skymoon?igsh=MXRmb2cyOTN3c3R3YQ==" class="text-2xl text-gray-400 hover:text-pink-600 transition"><i class="fab fa-instagram"></i></a>
-                    
                 </div>
             </div>
         </div>
@@ -179,15 +178,20 @@
         document.addEventListener('DOMContentLoaded', async () => {
             
             // -----------------------------------------------------------
-            // 1. دریافت تم و اعمال افکت‌های مناسبتی (Christmas, Yalda, ...)
+            // 1. دریافت تم و اعمال تنظیمات (رنگ، پس‌زمینه، مناسبت)
             // -----------------------------------------------------------
             try {
                 const res = await fetch('/api/theme');
                 if(res.ok) {
                     const theme = await res.json();
                     
-                    // تغییر رنگ اصلی
+                    // اعمال رنگ اصلی
                     document.documentElement.style.setProperty('--primary-color', theme.primary);
+
+                    // اعمال تصویر پس‌زمینه هیرو (Hero Image)
+                    if (theme.heroImage && theme.heroImage.trim() !== '') {
+                        document.getElementById('hero-section').style.backgroundImage = `url('${theme.heroImage}')`;
+                    }
 
                     // اعمال افکت‌های مناسبتی
                     if (theme.occasion === 'christmas') {
@@ -195,10 +199,10 @@
                         addCornerDecoration('https://cdn-icons-png.flaticon.com/512/622/622838.png'); // Gift Icon
                     } else if (theme.occasion === 'yalda') {
                         createRedTheme();
-                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/4062/4062916.png'); // Pomegranate Icon
+                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/4062/4062916.png'); // Pomegranate
                     } else if (theme.occasion === 'nowruz') {
                         createSpringEffect();
-                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/2869/2869442.png'); // Flower Icon
+                        addCornerDecoration('https://cdn-icons-png.flaticon.com/512/2869/2869442.png'); // Flower
                     }
                 }
             } catch(e) { console.log('Using Default Theme'); }
@@ -216,9 +220,8 @@
             }
 
             // -----------------------------------------------------------
-            // 3. دریافت پیشنهادات سرآشپز (از دیتابیس)
+            // 3. دریافت پیشنهادات سرآشپز (فقط آیتم‌های ستاره‌دار)
             // -----------------------------------------------------------
-            // 3. دریافت پیشنهادات سرآشپز (آیتم‌های ستاره‌دار)
             const specialsGrid = document.getElementById('specials-grid');
             try {
                 const menuRes = await fetch('/api/menu');
@@ -226,25 +229,24 @@
                     const menuItems = await menuRes.json();
                     
                     if(menuItems.length > 0) {
-                        specialsGrid.innerHTML = ''; // حذف لودینگ
+                        specialsGrid.innerHTML = ''; // پاک کردن لودینگ
                         
-                        // فیلتر کردن آیتم‌هایی که ستاره دارند
+                        // ۱. فقط آیتم‌هایی که ستاره دارند (is_featured = true)
                         let featured = menuItems.filter(item => item.is_featured);
 
-                        // اگر هیچ آیتم ستاره‌داری نبود، به عنوان جایگزین ۳ تای اول را نشان بده
+                        // ۲. اگر هیچ آیتم ستاره‌داری نبود، ۳ تای اول را نشان بده (به عنوان پشتیبان)
                         if (featured.length === 0) {
                             featured = menuItems.slice(0, 3);
                         }
                         
-                        // نمایش آیتم‌ها (محدود به ۳ تا برای زیبایی طرح، یا همه اگر می‌خواهید)
-                        // اینجا همه ستاره‌دارها را نشان می‌دهیم
+                        // نمایش آیتم‌ها
                         featured.forEach(item => {
                             const price = Number(item.price).toLocaleString();
                             const imgSrc = item.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600';
                             
                             const html = `
                                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300 h-full flex flex-col relative">
-                                    <div class="absolute top-4 right-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg z-10">
+                                    <div class="absolute top-4 right-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg z-10 animate-bounce">
                                         <i class="fas fa-star mr-1"></i> پیشنهاد ویژه
                                     </div>
 
@@ -265,25 +267,21 @@
                             specialsGrid.innerHTML += html;
                         });
                     } else {
+                        // اگر دیتابیس کلاً خالی بود
                         specialsGrid.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-10 border border-white/5 rounded-lg">منوی پیشنهادی به زودی اضافه می‌شود...</p>';
                     }
                 }
             } catch (e) {
                 console.error("Error fetching specials:", e);
-                // اگر سرور قطع بود، فال‌بک استاتیک نشان بده
-                specialsGrid.innerHTML = `
-                 <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
-                    <div class="h-48 overflow-hidden"><img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600" class="w-full h-full object-cover"></div>
-                    <div class="p-6"><h3 class="text-xl font-bold text-white mb-2">چیکن آلفردو</h3><span class="text-gold-500 font-bold">۲۴۵,۰۰۰ تومان</span></div>
-                </div>
-                `;
+                // فال‌بک خطا
+                specialsGrid.innerHTML = '<p class="col-span-3 text-center text-red-500">خطا در بارگذاری منو</p>';
             }
 
             // -----------------------------------------------------------
-            // 4. توابع افکت‌های مناسبتی (CSS Injection)
+            // 4. توابع افکت‌های مناسبتی (تزریق CSS و JS)
             // -----------------------------------------------------------
             
-            // الف) افکت برف (CSS + JS Loop)
+            // الف) برف کریسمس
             function createSnowEffect() {
                 const style = document.createElement('style');
                 style.innerHTML = `
@@ -297,16 +295,15 @@
                     flake.classList.add('snowflake');
                     flake.innerText = '❄';
                     flake.style.left = Math.random() * 100 + 'vw';
-                    flake.style.animationDuration = Math.random() * 3 + 4 + 's'; // سرعت آهسته
+                    flake.style.animationDuration = Math.random() * 3 + 4 + 's';
                     flake.style.opacity = Math.random() * 0.7 + 0.3;
                     document.body.appendChild(flake);
                     setTimeout(() => flake.remove(), 7000);
                 }, 300);
             }
 
-            // ب) افکت تم قرمز (یلدا)
+            // ب) تم یلدا (قرمز)
             function createRedTheme() {
-                // اورراید کردن رنگ اصلی
                 document.documentElement.style.setProperty('--primary-color', '#e11d48'); 
                 const style = document.createElement('style');
                 style.innerHTML = `
@@ -317,9 +314,9 @@
                 document.head.appendChild(style);
             }
 
-            // ج) افکت بهار (نوروز)
+            // ج) تم نوروز (سبز و گل)
             function createSpringEffect() {
-                document.documentElement.style.setProperty('--primary-color', '#10b981'); // سبز بهاری
+                document.documentElement.style.setProperty('--primary-color', '#10b981'); 
                 const style = document.createElement('style');
                 style.innerHTML = `
                     .flower { position: fixed; top: -10px; font-size: 1.5em; animation: fallRotate linear infinite; z-index: 9999; pointer-events: none; }
@@ -329,7 +326,7 @@
                 setInterval(() => {
                     const f = document.createElement('div');
                     f.classList.add('flower');
-                    f.innerText = '🌸'; // یا 🍃
+                    f.innerText = '🌸';
                     f.style.left = Math.random() * 100 + 'vw';
                     f.style.animationDuration = Math.random() * 5 + 4 + 's';
                     document.body.appendChild(f);
@@ -337,12 +334,11 @@
                 }, 600);
             }
 
-            // د) افزودن آیکون گوشه (گیفت/انار)
+            // د) آیکون گوشه صفحه
             function addCornerDecoration(iconUrl) {
                 const img = document.createElement('img');
                 img.src = iconUrl;
                 img.style.cssText = "position: fixed; bottom: 80px; right: 20px; width: 60px; z-index: 100; animation: bounce 3s infinite ease-in-out; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); cursor: pointer;";
-                img.title = "تبریک مناسبت!";
                 document.body.appendChild(img);
                 
                 const style = document.createElement('style');
