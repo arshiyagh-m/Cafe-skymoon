@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رزرو میز | کافه اسکای مون</title>
+    
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="assets/css/style.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,9 +24,14 @@
     <style>
         :root { --primary-color: #d4af37; }
         body { background-color: #0f0f0f; color: #f3f4f6; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .falling-item { position: fixed; top: -30px; z-index: 9999; pointer-events: none; animation: fall linear infinite; } 
         @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+        
+        /* استایل اختصاصی برای تقویم فارسی که با تم تیره هماهنگ شود */
+        .datepicker-plot-area { font-family: 'Vazirmatn', sans-serif !important; border-radius: 10px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .datepicker-header { background-color: #d4af37 !important; color: #000 !important; border-radius: 10px 10px 0 0; }
+        .datepicker-day-view .table-days td.selected span { background-color: #d4af37 !important; }
+        .datepicker-day-view .table-days td span { color: #333; }
     </style>
 </head>
 <body class="font-sans leading-relaxed flex flex-col min-h-screen">
@@ -45,9 +54,7 @@
             
             <div>
                 <h2 class="text-3xl text-gold-500 font-bold mb-6">فضاهای کافه</h2>
-                
                 <div id="spaces-container" class="space-y-6">
-                    <div class="bg-dark-800 h-32 rounded-lg animate-pulse border border-white/5"></div>
                     <div class="bg-dark-800 h-32 rounded-lg animate-pulse border border-white/5"></div>
                 </div>
             </div>
@@ -68,8 +75,8 @@
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-gray-400 text-sm mb-1">تاریخ</label>
-                            <input type="date" id="date" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-gray-300 focus:border-gold-500 focus:outline-none transition">
+                            <label class="block text-gray-400 text-sm mb-1">تاریخ (شمسی)</label>
+                            <input type="text" id="date" required class="w-full bg-dark-900 border border-white/10 rounded p-3 text-white focus:border-gold-500 focus:outline-none transition cursor-pointer" placeholder="انتخاب کنید..." readonly>
                         </div>
                         <div>
                             <label class="block text-gray-400 text-sm mb-1">ساعت</label>
@@ -124,9 +131,27 @@
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    <script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             
+            // 0. فعال‌سازی تقویم شمسی
+            $(document).ready(function() {
+                $('#date').pDatepicker({
+                    format: 'YYYY/MM/DD',
+                    initialValue: true, // تاریخ امروز را پیش‌فرض می‌گذارد
+                    autoClose: true,
+                    calendar: {
+                        persian: {
+                            locale: 'fa'
+                        }
+                    }
+                });
+            });
+
             // 1. دریافت و نمایش فضاها (Spaces)
             const spacesContainer = document.getElementById('spaces-container');
             const spaceSelect = document.getElementById('space');
@@ -137,10 +162,9 @@
                 
                 if (spaces.length > 0) {
                     spacesContainer.innerHTML = '';
-                    spaceSelect.innerHTML = ''; // خالی کردن گزینه‌های پیش‌فرض
+                    spaceSelect.innerHTML = ''; 
                     
                     spaces.forEach(space => {
-                        // ساخت کارت نمایش (سمت راست)
                         spacesContainer.innerHTML += `
                             <div class="bg-dark-800 rounded-lg overflow-hidden flex h-32 border border-white/5 hover:border-gold-500/30 transition group">
                                 <img src="${space.image}" class="w-1/3 object-cover group-hover:scale-105 transition duration-500" alt="${space.name}">
@@ -150,8 +174,6 @@
                                 </div>
                             </div>
                         `;
-
-                        // اضافه کردن به لیست انتخاب فرم (سمت چپ)
                         const option = document.createElement('option');
                         option.value = space.name;
                         option.innerText = space.name;
@@ -162,11 +184,10 @@
                     spaceSelect.innerHTML = '<option value="General">سالن اصلی</option>';
                 }
             } catch (e) {
-                console.error('Error fetching spaces:', e);
                 spacesContainer.innerHTML = '<p class="text-red-500">خطا در بارگذاری فضاها</p>';
             }
 
-            // 2. اعمال تم (کد مشترک)
+            // 2. اعمال تم
             try {
                 const res = await fetch('/api/theme');
                 if(res.ok) {
@@ -198,7 +219,7 @@
                 const data = {
                     name: document.getElementById('name').value,
                     phone: document.getElementById('phone').value,
-                    date: document.getElementById('date').value,
+                    date: document.getElementById('date').value, // تاریخ شمسی ارسال می‌شود
                     time: document.getElementById('time').value,
                     guests: document.getElementById('guests').value,
                     space: document.getElementById('space').value,
