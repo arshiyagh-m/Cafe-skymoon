@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منوی کافه اسکای مون</title>
-    
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,49 +14,45 @@
                     fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
                     colors: {
                         brand: {
-                            green: '#00b862',
-                            cream: '#f9f5f0',
-                            dark: '#1f1f1f',
+                            green: 'var(--brand-btn-color, #00b862)', // رنگ داینامیک دکمه
+                            cream: 'var(--brand-bg-color, #f9f5f0)', // رنگ داینامیک کارت
+                            text: 'var(--brand-text-color, #333)',
                         }
-                    },
-                    boxShadow: {
-                        'soft': '0 10px 30px -10px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #ffffff; color: #333; }
+        body { background-color: var(--page-bg, #ffffff); color: var(--brand-text-color, #333); transition: background 0.5s; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .animate-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        
+        /* افکت‌های مناسبتی */
+        .snowflake, .heart, .flower { position: fixed; top: -20px; z-index: 9999; pointer-events: none; animation-name: fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+        @keyframes fall { to { transform: translateY(105vh); } }
     </style>
 </head>
 <body class="font-sans leading-relaxed pb-20">
 
-    <header class="flex justify-between items-center p-5 sticky top-0 bg-white/95 backdrop-blur-sm z-50 shadow-sm">
-        <button class="text-2xl text-gray-700"><i class="fas fa-bars"></i></button>
+    <header class="flex justify-between items-center p-5 sticky top-0 bg-white/95 backdrop-blur-sm z-50 shadow-sm transition-colors" id="main-header">
+        <button class="text-2xl opacity-70"><i class="fas fa-bars"></i></button>
         <div class="text-center">
-            <span class="text-xl font-black text-purple-700 tracking-wide">SKYMOON</span>
-            <span class="block text-[10px] text-gray-400 -mt-1 tracking-widest uppercase">Cafe & Restaurant</span>
+            <span class="text-xl font-black tracking-wide" id="logo-text" style="color: #4a00e0;">SKYMOON</span>
+            <span class="block text-[10px] opacity-50 -mt-1 tracking-widest uppercase">Cafe & Restaurant</span>
         </div>
-        <a href="index.html" class="text-xl text-gray-700"><i class="fas fa-arrow-left"></i></a>
+        <a href="index.html" class="text-xl opacity-70"><i class="fas fa-arrow-left"></i></a>
     </header>
 
     <section class="mt-4 px-4">
-        <h2 class="text-lg font-bold mb-4 text-gray-800">دسته‌بندی‌ها</h2>
-        <div id="category-container" class="flex overflow-x-auto gap-3 pb-4 scrollbar-hide snap-x">
-            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
-            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
-            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
-        </div>
+        <h2 class="text-lg font-bold mb-4 opacity-90">دسته‌بندی‌ها</h2>
+        <div id="category-container" class="flex overflow-x-auto gap-3 pb-4 scrollbar-hide snap-x"></div>
     </section>
 
     <main class="mt-2 px-4 container mx-auto max-w-2xl">
-        <div id="menu-grid" class="flex flex-col gap-6">
-            </div>
+        <div id="menu-grid" class="flex flex-col gap-6"></div>
     </main>
 
     <script>
@@ -68,124 +61,115 @@
             const menuGrid = document.getElementById('menu-grid');
             let allItems = [];
 
-            // ۱. دریافت داده‌ها
+            // ۱. دریافت تم و اعمال ظاهر
+            try {
+                const theme = await (await fetch('/api/theme')).json();
+                applyTheme(theme);
+            } catch(e) {}
+
+            // ۲. دریافت منو
             try {
                 const res = await fetch('/api/menu');
                 if(!res.ok) throw new Error();
                 allItems = await res.json();
-                
-                if(allItems.length > 0) {
-                    renderCategories(allItems);
-                    renderItems('همه');
-                } else {
-                    menuGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">منو خالی است.</p>';
-                    categoryContainer.innerHTML = '';
+                if(allItems.length > 0) { renderCategories(allItems); renderItems('همه'); }
+                else menuGrid.innerHTML = '<p class="text-center opacity-50 mt-10">منو خالی است.</p>';
+            } catch(e) { menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت</p>'; }
+
+            // تابع اعمال تم
+            function applyTheme(theme) {
+                const root = document.documentElement;
+                const occ = theme.occasion || 'none';
+
+                // تصویر پس‌زمینه منو (اگر تنظیم شده باشد)
+                if(theme.menuBg) {
+                    document.body.style.backgroundImage = `url('${theme.menuBg}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundAttachment = 'fixed';
                 }
-            } catch(e) {
-                console.error(e);
-                menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت منو</p>';
+
+                // منطق مناسبت‌ها
+                if (occ === 'christmas') {
+                    root.style.setProperty('--brand-btn-color', '#d42f2f'); // قرمز کریسمس
+                    root.style.setProperty('--brand-bg-color', '#fff0f0'); // زمینه صورتی خیلی کم‌رنگ
+                    createFallingEffect('❄️');
+                } else if (occ === 'yalda') {
+                    root.style.setProperty('--brand-btn-color', '#b91c1c'); // قرمز اناری
+                    root.style.setProperty('--brand-bg-color', '#2a0a0a'); // زمینه تیره یلدا
+                    root.style.setProperty('--brand-text-color', '#ffffff'); // متن سفید
+                    root.style.setProperty('--page-bg', '#1a0505'); 
+                    document.getElementById('main-header').classList.remove('bg-white/95');
+                    document.getElementById('main-header').classList.add('bg-black/80', 'text-white');
+                    createFallingEffect('🍉');
+                } else if (occ === 'valentine') {
+                    root.style.setProperty('--brand-btn-color', '#db2777'); // صورتی جیغ
+                    root.style.setProperty('--brand-bg-color', '#fce7f3'); // زمینه صورتی روشن
+                    document.getElementById('logo-text').style.color = '#db2777';
+                    createFallingEffect('❤️');
+                } else if (occ === 'nowruz') {
+                    root.style.setProperty('--brand-btn-color', '#10b981'); // سبز بهاری
+                    root.style.setProperty('--brand-bg-color', '#ecfdf5'); // سبز خیلی روشن
+                    createFallingEffect('🌸');
+                }
             }
 
-            // ۲. ساخت کارت‌های دسته‌بندی (با عکس آیتم)
             function renderCategories(items) {
                 const categories = ['همه', ...new Set(items.map(i => i.category))];
                 categoryContainer.innerHTML = '';
-
                 categories.forEach((cat, index) => {
-                    // پیدا کردن عکس برای دسته
-                    let categoryImage = 'https://via.placeholder.com/150'; // عکس پیش‌فرض
-                    
-                    if (cat === 'همه') {
-                        // برای "همه"، عکس اولین آیتم کل لیست را بردار
-                        if (items.length > 0 && items[0].image) categoryImage = items[0].image;
-                    } else {
-                        // برای سایر دسته‌ها، اولین آیتم همان دسته را پیدا کن
-                        const firstItemInCategory = items.find(i => i.category === cat);
-                        if (firstItemInCategory && firstItemInCategory.image) {
-                            categoryImage = firstItemInCategory.image;
-                        }
-                    }
+                    let imgUrl = 'https://via.placeholder.com/150';
+                    if(cat==='همه' && items[0]?.image) imgUrl = items[0].image;
+                    else { const f = items.find(i=>i.category===cat); if(f?.image) imgUrl = f.image; }
 
                     const btn = document.createElement('div');
-                    // اضافه کردن کلاس group برای هاور عکس
-                    btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-gray-100`;
-                    
-                    btn.innerHTML = `
-                        <img src="${categoryImage}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${cat}">
-                        
-                        <div class="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors"></div>
-                        
-                        <div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10">
-                            <span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span>
-                            <span class="text-[10px] bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full mt-1">
-                                ${cat === 'همه' ? items.length : items.filter(i => i.category === cat).length} آیتم
-                            </span>
-                        </div>
-                    `;
-
+                    btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-white/20`;
+                    btn.innerHTML = `<img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div><div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10"><span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span></div>`;
                     btn.addEventListener('click', () => {
-                        // انیمیشن انتخاب (بوردر رنگی)
-                        // اول بوردر قبلی‌ها رو پاک کنیم
-                        document.querySelectorAll('#category-container > div').forEach(d => {
-                            d.classList.remove('ring-4', 'ring-brand-green');
-                        });
-                        
-                        btn.classList.add('ring-4', 'ring-brand-green');
+                        document.querySelectorAll('#category-container > div').forEach(d => d.classList.remove('ring-4', 'ring-white'));
+                        btn.classList.add('ring-4', 'ring-white');
                         renderItems(cat);
                     });
-
-                    // فعال کردن دسته اول به صورت پیش‌فرض
-                    if(index === 0) btn.classList.add('ring-4', 'ring-brand-green');
-
+                    if(index===0) btn.classList.add('ring-4', 'ring-white');
                     categoryContainer.appendChild(btn);
                 });
             }
 
-            // ۳. نمایش آیتم‌ها
             function renderItems(filter) {
                 menuGrid.innerHTML = '';
-                
                 const filtered = filter === 'همه' ? allItems : allItems.filter(i => i.category === filter);
-
-                if(filtered.length === 0) {
-                    menuGrid.innerHTML = '<p class="text-center text-gray-400 py-10">موردی یافت نشد.</p>';
-                    return;
-                }
+                if(filtered.length === 0) { menuGrid.innerHTML = '<p class="text-center opacity-50 py-10">خالی</p>'; return; }
 
                 filtered.forEach((item, index) => {
                     const price = Number(item.price).toLocaleString();
                     const img = item.image || 'https://via.placeholder.com/300';
                     const delay = index * 100;
+                    const badge = item.is_featured ? `<div class="absolute top-4 right-4 bg-white/90 text-black px-3 py-1 rounded-full text-xs font-bold shadow-sm z-10">ویژه</div>` : '';
 
-                    const badge = item.is_featured 
-                        ? `<div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-brand-green px-3 py-1 rounded-full text-xs font-bold shadow-sm z-10">ویژه</div>` 
-                        : '';
-
-                    const card = `
-                        <div class="bg-brand-cream rounded-[35px] p-6 relative shadow-soft animate-up flex flex-col items-center text-center group" style="animation-delay: ${delay}ms">
+                    menuGrid.innerHTML += `
+                        <div class="bg-brand-cream rounded-[35px] p-6 relative shadow-soft animate-up flex flex-col items-center text-center group text-brand-text" style="animation-delay: ${delay}ms">
                             ${badge}
-                            
-                            <div class="w-48 h-48 mb-4 relative drop-shadow-xl transition-transform duration-500 group-hover:scale-105">
-                                <img src="${img}" class="w-full h-full object-contain" alt="${item.name}">
-                            </div>
-
-                            <h3 class="text-2xl font-black text-gray-800 mb-2">${item.name}</h3>
-                            
-                            ${item.description ? `<p class="text-gray-500 text-sm mb-6 line-clamp-2 px-2">${item.description}</p>` : '<div class="mb-4"></div>'}
-
+                            <div class="w-48 h-48 mb-4 relative drop-shadow-xl transition-transform duration-500 group-hover:scale-105"><img src="${img}" class="w-full h-full object-contain" alt="${item.name}"></div>
+                            <h3 class="text-2xl font-black mb-2">${item.name}</h3>
+                            ${item.description ? `<p class="opacity-70 text-sm mb-6 line-clamp-2 px-2">${item.description}</p>` : '<div class="mb-4"></div>'}
                             <div class="w-full flex justify-between items-center mt-auto px-2 border-t border-black/5 pt-4">
-                                <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-500/20 active:scale-95 text-sm">
-                                    سفارش
-                                </button>
-                                <div class="flex flex-col items-end">
-                                    <span class="text-brand-green font-black text-xl dir-ltr">${price}</span>
-                                    <span class="text-gray-400 text-[10px]">تومان</span>
-                                </div>
+                                <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition shadow-lg active:scale-95 text-sm">سفارش</button>
+                                <div class="flex flex-col items-end"><span class="font-black text-xl dir-ltr text-brand-green">${price}</span><span class="opacity-50 text-[10px]">تومان</span></div>
                             </div>
-                        </div>
-                    `;
-                    menuGrid.innerHTML += card;
+                        </div>`;
                 });
+            }
+
+            function createFallingEffect(emoji) {
+                setInterval(() => {
+                    const el = document.createElement('div');
+                    el.innerText = emoji;
+                    el.style.cssText = `position:fixed; top:-30px; left:${Math.random()*100}vw; font-size:${Math.random()*20+10}px; animation:fall ${Math.random()*3+3}s linear; z-index:9999; opacity:${Math.random()}; pointer-events:none;`;
+                    document.body.appendChild(el);
+                    setTimeout(()=>el.remove(), 6000);
+                }, 300);
+                const style = document.createElement('style');
+                style.innerHTML = `@keyframes fall { to { transform: translateY(105vh) rotate(${Math.random()*360}deg); } }`;
+                document.head.appendChild(style);
             }
         });
     </script>
