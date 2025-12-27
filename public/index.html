@@ -20,12 +20,12 @@
                     colors: {
                         gold: {
                             400: '#fbbf24',
-                            500: '#d4af37', // رنگ اصلی طلایی
+                            500: 'var(--primary-color)', // اتصال به تم داینامیک
                             600: '#b4942b',
                         },
                         dark: {
-                            900: '#0f0f0f', // پس زمینه خیلی تیره
-                            800: '#1a1a1a', // کارت‌ها
+                            900: '#0f0f0f',
+                            800: '#1a1a1a',
                         }
                     }
                 }
@@ -33,8 +33,16 @@
         }
     </script>
     <style>
+        /* مقادیر پیش‌فرض (تا قبل از لود شدن از دیتابیس) */
+        :root {
+            --primary-color: #d4af37;
+        }
         body { background-color: #0f0f0f; color: #f3f4f6; }
         .text-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        
+        /* انیمیشن لود */
+        .animate-fade-in { animation: fadeIn 1s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="font-sans leading-relaxed flex flex-col min-h-screen">
@@ -54,7 +62,7 @@
                 <a href="contact.html" class="hover:text-gold-500 transition">تماس با ما</a>
             </nav>
 
-            <button id="mobile-menu-btn" class="md:hidden text-2xl text-gold-500">
+            <button id="mobile-menu-btn" class="md:hidden text-2xl text-gold-500 focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -66,18 +74,19 @@
                 <a href="reservation.html" class="hover:text-gold-500">رزرو میز</a>
                 <a href="gallery.html" class="hover:text-gold-500">گالری</a>
                 <a href="contact.html" class="hover:text-gold-500">تماس با ما</a>
+                <a href="admin/login.html" class="text-xs text-gray-500 mt-2">ورود مدیریت</a>
             </div>
         </div>
     </header>
 
     <section class="relative h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat bg-fixed mt-16">
         <div class="absolute inset-0 bg-black/60"></div>
-        <div class="relative z-10 text-center px-4">
-            <img src="1000221539.jpg" class="h-24 w-24 mx-auto mb-4 rounded-full border-2 border-gold-500 shadow-lg animate-fade-in" alt="Logo">
+        <div class="relative z-10 text-center px-4 animate-fade-in">
+            <img src="1000221539.jpg" class="h-24 w-24 mx-auto mb-4 rounded-full border-2 border-gold-500 shadow-lg" alt="Logo">
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 text-shadow">کافه اسکای مون</h1>
             <p class="text-xl md:text-2xl text-gray-200 mb-8 font-light tracking-wider">"کیفیت بالا بدون فیلتر"</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="menu.html" class="px-8 py-3 bg-gold-500 text-dark-900 font-bold rounded hover:bg-gold-400 transition transform hover:-translate-y-1">مشاهده منو</a>
+                <a href="menu.html" class="px-8 py-3 bg-gold-500 text-dark-900 font-bold rounded hover:bg-gold-400 transition transform hover:-translate-y-1 shadow-lg shadow-gold-500/20">مشاهده منو</a>
                 <a href="reservation.html" class="px-8 py-3 border border-white text-white font-bold rounded hover:bg-white hover:text-dark-900 transition transform hover:-translate-y-1">رزرو میز</a>
             </div>
         </div>
@@ -94,7 +103,7 @@
         <div class="container mx-auto px-4">
             <h2 class="text-3xl text-gold-500 mb-10 text-center font-bold border-b border-gold-500/30 pb-4 inline-block mx-auto flex w-fit">پیشنهاد سرآشپز</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
                     <div class="h-48 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Chiken Alfredo">
                     </div>
@@ -104,7 +113,7 @@
                         <span class="text-gold-500 font-bold text-lg">۲۴۵,۰۰۰ تومان</span>
                     </div>
                 </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
                     <div class="h-48 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1546964124-0cce460f38ef?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Latte">
                     </div>
@@ -114,7 +123,7 @@
                         <span class="text-gold-500 font-bold text-lg">۹۵,۰۰۰ تومان</span>
                     </div>
                 </div>
-                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition">
+                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300">
                     <div class="h-48 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Steak">
                     </div>
@@ -133,11 +142,11 @@
             <i class="fas fa-quote-right text-4xl text-gold-500 mb-6"></i>
             <h2 class="text-2xl text-white mb-8">نظرات مشتریان ما</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <div class="bg-dark-800 p-6 rounded-lg">
+                <div class="bg-dark-800 p-6 rounded-lg border border-white/5">
                     <p class="text-gray-300 italic mb-4">"یه کافه عالی و دنج با پرسنل فوق‌العاده مودب. کیفیت قهوه‌هاشون واقعاً بی‌نظیره."</p>
                     <h4 class="text-gold-500 font-bold">- سارا م.</h4>
                 </div>
-                <div class="bg-dark-800 p-6 rounded-lg">
+                <div class="bg-dark-800 p-6 rounded-lg border border-white/5">
                     <p class="text-gray-300 italic mb-4">"محیط وی‌آی‌پی برای قرارهای کاری خیلی مناسب بود. حتما پاستا آلفردو رو امتحان کنید."</p>
                     <h4 class="text-gold-500 font-bold">- علی رضایی</h4>
                 </div>
@@ -149,12 +158,12 @@
         <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-right">
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
-                <p class="text-gray-500 text-sm">کیفیت بالا بدون فیلتر. <br> تجربه طعم‌های واقعی در محیطی رویایی.</p>
+                <p class="text-gray-500 text-sm leading-7">کیفیت بالا بدون فیلتر. <br> تجربه طعم‌های واقعی در محیطی رویایی.</p>
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">تماس با ما</h3>
-                <p class="text-gray-400 mb-2"><i class="fas fa-map-marker-alt ml-2"></i>میاندوآب، کوی سعادت، روبروی جهاد</p>
-                <p class="text-gray-400 mb-2"><i class="fas fa-phone ml-2"></i>۰۹۱۹۴۳۵۸۴۰۰</p>
+                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-map-marker-alt ml-2 text-gold-500"></i>میاندوآب، کوی سعادت، روبروی جهاد</p>
+                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-phone ml-2 text-gold-500"></i>۰۹۱۹۴۳۵۸۴۰۰</p>
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">شبکه‌های اجتماعی</h3>
@@ -173,6 +182,33 @@
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
-    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // 1. دریافت تم داینامیک از Backend
+            try {
+                const res = await fetch('/api/theme');
+                if(res.ok) {
+                    const theme = await res.json();
+                    
+                    // تغییر متغیر CSS برای رنگ اصلی (این متغیر در تنظیمات Tailwind بالا استفاده شده)
+                    document.documentElement.style.setProperty('--primary-color', theme.primary);
+                    
+                    // تغییر بک‌گراند اگر نیاز بود
+                    // document.body.style.backgroundColor = theme.bg;
+                }
+            } catch(e) { console.log('Using Default Theme'); }
+
+            // 2. مدیریت منوی موبایل
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if(menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
