@@ -1,232 +1,114 @@
 const express = require('express');
-const { Pool } = require('pg'); // درایور پستگرس
+const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
 const app = express();
 
-// --- تنظیمات اولیه ---
 app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
-// --- اتصال به دیتابیس PostgreSQL ---
 const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/skymoon';
+const pool = new Pool({ connectionString, ssl: false });
 
-const pool = new Pool({
-  connectionString: connectionString,
-  ssl: false // غیرفعال کردن SSL برای اتصال درون‌شبکه‌ای لیارا
-});
-
-// --- ایجاد و تعمیر جدول‌ها ---
 const initDB = async () => {
     try {
         const client = await pool.connect();
         
-        // 1. ساخت جدول منو (اگر وجود نداشته باشد)
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS menu (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                category TEXT NOT NULL,
-                price NUMERIC NOT NULL,
-                description TEXT,
-                image TEXT
-            );
-        `);
+        // جداول اصلی
+        await client.query(`CREATE TABLE IF NOT EXISTS menu (id SERIAL PRIMARY KEY, name TEXT, category TEXT, price NUMERIC, description TEXT, image TEXT);`);
+        await client.query(`CREATE TABLE IF NOT EXISTS gallery (id SERIAL PRIMARY KEY, image TEXT, caption TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
+        await client.query(`CREATE TABLE IF NOT EXISTS reservations (id SERIAL PRIMARY KEY, name TEXT, phone TEXT, date TEXT, time TEXT, guests TEXT, space TEXT, occasion TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
+        await client.query(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value JSONB);`);
 
-        // 2. *** بخش تعمیر دیتابیس *** // این دستور تضمین می‌کند که اگر جدول از قبل بود ولی ستون is_featured را نداشت، آن را اضافه کند
-        await client.query(`
-            ALTER TABLE menu ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
-        `);
+        // --- تعمیر و آپدیت خودکار دیتابیس ---
+        
+        // 1. اضافه کردن ستون ویژه به منو
+        await client.query(`ALTER TABLE menu ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;`);
+        
+        // 2. اضافه کردن ستون ویژه به گالری (جدید)
+        await client.query(`ALTER TABLE gallery ADD COLUMN IF NOT EXISTS is_home_featured BOOLEAN DEFAULT FALSE;`);
 
-        // 3. جدول گالری
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS gallery (
-                id SERIAL PRIMARY KEY,
-                image TEXT NOT NULL,
-                caption TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // 4. جدول رزرو
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS reservations (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                date TEXT NOT NULL,
-                time TEXT NOT NULL,
-                guests TEXT NOT NULL,
-                space TEXT,
-                occasion TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        // 5. جدول تنظیمات
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS settings (
-                key TEXT PRIMARY KEY,
-                value JSONB
-            );
-        `);
-
-        console.log('✅ Database tables verified and patched successfully');
+        console.log('✅ Database verified and patched');
         client.release();
-    } catch (err) {
-        console.error('❌ Error initializing database:', err);
-    }
+    } catch (err) { console.error('❌ DB Error:', err); }
 };
-
 initDB();
 
+// --- API Routes ---
 
-// =========================================================
-// API Routes
-// =========================================================
-
-// --- مدیریت منو ---
-
-// دریافت منو (آیتم‌های ویژه اول می‌آیند)
+// Menu
 app.get('/api/menu', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM menu ORDER BY is_featured DESC, id ASC');
-        res.json(result.rows);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query('SELECT * FROM menu ORDER BY is_featured DESC, id ASC');
+    res.json(result.rows);
 });
-
-// افزودن آیتم
 app.post('/api/menu', async (req, res) => {
-    try {
-        const { name, category, price, description, image } = req.body;
-        // مقدار پیش‌فرض is_featured را false می‌گذاریم
-        const result = await pool.query(
-            'INSERT INTO menu (name, category, price, description, image, is_featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [name, category, price, description, image, false]
-        );
-        res.json(result.rows[0]);
-    } catch (e) { 
-        console.error(e);
-        res.status(500).json({ error: e.message }); 
-    }
+    const { name, category, price, description, image } = req.body;
+    const result = await pool.query('INSERT INTO menu (name, category, price, description, image, is_featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [name, category, price, description, image, false]);
+    res.json(result.rows[0]);
 });
-
-// ویرایش کامل آیتم
 app.put('/api/menu/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, category, price, description, image } = req.body;
-        
-        const result = await pool.query(
-            'UPDATE menu SET name=$1, category=$2, price=$3, description=$4, image=$5 WHERE id=$6 RETURNING *',
-            [name, category, price, description, image, id]
-        );
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { name, category, price, description, image } = req.body;
+    const result = await pool.query('UPDATE menu SET name=$1, category=$2, price=$3, description=$4, image=$5 WHERE id=$6 RETURNING *', [name, category, price, description, image, req.params.id]);
+    res.json(result.rows[0]);
 });
-
-// تغییر وضعیت ستاره (Toggle Featured)
 app.patch('/api/menu/:id/toggle-feature', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await pool.query(
-            'UPDATE menu SET is_featured = NOT is_featured WHERE id = $1 RETURNING *',
-            [id]
-        );
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query('UPDATE menu SET is_featured = NOT is_featured WHERE id = $1 RETURNING *', [req.params.id]);
+    res.json(result.rows[0]);
 });
-
-// حذف آیتم
 app.delete('/api/menu/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM menu WHERE id = $1', [req.params.id]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query('DELETE FROM menu WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
 });
 
-// --- مدیریت گالری ---
+// Gallery (آپدیت شده)
 app.get('/api/gallery', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM gallery ORDER BY created_at DESC');
-        res.json(result.rows);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    // اول عکس‌های ویژه صفحه اصلی، بعد بقیه بر اساس تاریخ
+    const result = await pool.query('SELECT * FROM gallery ORDER BY is_home_featured DESC, created_at DESC');
+    res.json(result.rows);
 });
-
 app.post('/api/gallery', async (req, res) => {
-    try {
-        const { image, caption } = req.body;
-        const result = await pool.query(
-            'INSERT INTO gallery (image, caption) VALUES ($1, $2) RETURNING *',
-            [image, caption]
-        );
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { image, caption } = req.body;
+    // پیش‌فرض false
+    const result = await pool.query('INSERT INTO gallery (image, caption, is_home_featured) VALUES ($1, $2, $3) RETURNING *', [image, caption, false]);
+    res.json(result.rows[0]);
 });
-
+// ** روت جدید: تغییر وضعیت نمایش در صفحه اصلی **
+app.patch('/api/gallery/:id/toggle-home', async (req, res) => {
+    const result = await pool.query('UPDATE gallery SET is_home_featured = NOT is_home_featured WHERE id = $1 RETURNING *', [req.params.id]);
+    res.json(result.rows[0]);
+});
 app.delete('/api/gallery/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM gallery WHERE id = $1', [req.params.id]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query('DELETE FROM gallery WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
 });
 
-// --- مدیریت رزروها ---
+// Reservations
 app.get('/api/reservations', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
-        res.json(result.rows);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
+    res.json(result.rows);
 });
-
 app.post('/api/reservations', async (req, res) => {
-    try {
-        const { name, phone, date, time, guests, space, occasion } = req.body;
-        const result = await pool.query(
-            'INSERT INTO reservations (name, phone, date, time, guests, space, occasion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [name, phone, date, time, guests, space, occasion]
-        );
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { name, phone, date, time, guests, space, occasion } = req.body;
+    const result = await pool.query('INSERT INTO reservations (name, phone, date, time, guests, space, occasion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [name, phone, date, time, guests, space, occasion]);
+    res.json(result.rows[0]);
 });
-
 app.delete('/api/reservations/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
 });
 
-// --- تنظیمات تم ---
+// Theme
 app.get('/api/theme', async (req, res) => {
-    try {
-        const result = await pool.query("SELECT value FROM settings WHERE key = 'theme'");
-        if (result.rows.length > 0) {
-            res.json(result.rows[0].value);
-        } else {
-            res.json({ primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
-        }
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'theme'");
+    res.json(result.rows.length > 0 ? result.rows[0].value : { primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
 });
-
 app.post('/api/theme', async (req, res) => {
-    try {
-        const value = req.body;
-        await pool.query(
-            `INSERT INTO settings (key, value) VALUES ('theme', $1) 
-             ON CONFLICT (key) DO UPDATE SET value = $1`,
-            [value]
-        );
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query("INSERT INTO settings (key, value) VALUES ('theme', $1) ON CONFLICT (key) DO UPDATE SET value = $1", [req.body]);
+    res.json({ success: true });
 });
 
-// مسیر پیش‌فرض
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// --- اجرا ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
