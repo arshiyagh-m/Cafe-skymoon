@@ -1,0 +1,12 @@
+:root {
+    --primary-color: #d4af37; /* Default Gold */
+    --bg-color: #0f0f0f;      /* Default Dark */
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+.text-gold, .btn-primary {
+    color: var(--primary-color);
+}
