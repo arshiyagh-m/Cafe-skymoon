@@ -22,7 +22,7 @@ const initDB = async () => {
     try {
         const client = await pool.connect();
         
-        // 1. جدول منو
+        // 1. جدول منو (با فیلد ویژه is_featured)
         await client.query(`
             CREATE TABLE IF NOT EXISTS menu (
                 id SERIAL PRIMARY KEY,
@@ -30,7 +30,8 @@ const initDB = async () => {
                 category TEXT NOT NULL,
                 price NUMERIC NOT NULL,
                 description TEXT,
-                image TEXT
+                image TEXT,
+                is_featured BOOLEAN DEFAULT FALSE
             );
         `);
 
@@ -82,25 +83,28 @@ initDB();
 // =========================================================
 
 // --- مدیریت منو ---
+
+// دریافت منو (آیتم‌های ویژه اول می‌آیند)
 app.get('/api/menu', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM menu ORDER BY id ASC');
+        const result = await pool.query('SELECT * FROM menu ORDER BY is_featured DESC, id ASC');
         res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// افزودن آیتم
 app.post('/api/menu', async (req, res) => {
     try {
         const { name, category, price, description, image } = req.body;
         const result = await pool.query(
-            'INSERT INTO menu (name, category, price, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [name, category, price, description, image]
+            'INSERT INTO menu (name, category, price, description, image, is_featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [name, category, price, description, image, false]
         );
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ** روت جدید: ویرایش آیتم منو **
+// ویرایش کامل آیتم
 app.put('/api/menu/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -114,6 +118,20 @@ app.put('/api/menu/:id', async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ** جدید: تغییر وضعیت ستاره (Toggle Featured) **
+app.patch('/api/menu/:id/toggle-feature', async (req, res) => {
+    try {
+        const { id } = req.params;
+        // مقدار is_featured را برعکس می‌کند (true -> false و برعکس)
+        const result = await pool.query(
+            'UPDATE menu SET is_featured = NOT is_featured WHERE id = $1 RETURNING *',
+            [id]
+        );
+        res.json(result.rows[0]);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// حذف آیتم
 app.delete('/api/menu/:id', async (req, res) => {
     try {
         await pool.query('DELETE FROM menu WHERE id = $1', [req.params.id]);
@@ -189,6 +207,7 @@ app.get('/api/theme', async (req, res) => {
 app.post('/api/theme', async (req, res) => {
     try {
         const value = req.body;
+        // Upsert برای Postgres
         await pool.query(
             `INSERT INTO settings (key, value) VALUES ('theme', $1) 
              ON CONFLICT (key) DO UPDATE SET value = $1`,
