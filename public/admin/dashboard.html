@@ -160,45 +160,56 @@
         </div>
     </div>
 
-    <script>
-        // --- احراز هویت ---
+        <script>
+        // =========================================================
+        // ۰. احراز هویت و تنظیمات اولیه
+        // =========================================================
         const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
         if (isLoggedIn !== 'true') window.location.href = "login.html";
-        document.getElementById('logoutBtn').addEventListener('click', () => { if(confirm('خروج؟')) { localStorage.removeItem('isAdminLoggedIn'); window.location.href = 'login.html'; }});
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => { 
+            if(confirm('آیا می‌خواهید خارج شوید؟')) { 
+                localStorage.removeItem('isAdminLoggedIn'); 
+                window.location.href = 'login.html'; 
+            }
+        });
 
-        // --- تغییر تب‌ها ---
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId + '-section').classList.remove('hidden');
         }
 
         // =========================================================
-        // مدیریت رزروها
+        // ۱. مدیریت رزروها
         // =========================================================
         async function loadReservations() {
             const container = document.getElementById('reservations-list');
             try {
                 const res = await fetch('/api/reservations');
-                if(!res.ok) throw new Error('خطا');
+                if(!res.ok) throw new Error('خطا در ارتباط');
                 const list = await res.json();
+                
                 container.innerHTML = '';
-                if(list.length === 0) { container.innerHTML = '<p class="text-gray-500">هیچ رزروی موجود نیست.</p>'; return; }
+                if(list.length === 0) { 
+                    container.innerHTML = '<p class="text-gray-500">هیچ رزروی موجود نیست.</p>'; 
+                    return; 
+                }
 
                 list.forEach(item => {
                     container.innerHTML += `
                         <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative">
                             <h3 class="font-bold text-lg text-white mb-2">${item.name}</h3>
-                            <p class="text-gray-400 text-sm mb-1">${item.date} | ${item.time}</p>
-                            <p class="text-gray-400 text-sm mb-1">${item.guests} نفر | ${item.phone}</p>
-                            <button onclick="deleteRes('${item.id}')" class="text-red-400 text-sm absolute top-4 left-4"><i class="fas fa-trash"></i></button>
+                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-1"></i> ${item.date} | ${item.time}</p>
+                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-1"></i> ${item.guests} نفر | ${item.phone}</p>
+                            <button onclick="deleteRes('${item.id}')" class="text-red-400 text-sm absolute top-4 left-4 hover:text-red-200 transition"><i class="fas fa-trash"></i></button>
                         </div>`;
                 });
-            } catch (e) { container.innerHTML = '<p class="text-red-500">خطا در دریافت</p>'; }
+            } catch (e) { container.innerHTML = '<p class="text-red-500">خطا در دریافت رزروها</p>'; }
         }
         window.deleteRes = async (id) => { if(confirm('حذف رزرو؟')) { await fetch(`/api/reservations/${id}`, { method: 'DELETE' }); loadReservations(); } }
 
         // =========================================================
-        // مدیریت منو (با ستاره و ویرایش)
+        // ۲. مدیریت منو (با ستاره و ویرایش)
         // =========================================================
         async function loadMenu() {
             const tableBody = document.getElementById('menu-table-body');
@@ -206,27 +217,29 @@
                 const res = await fetch('/api/menu');
                 const list = await res.json();
                 tableBody.innerHTML = '';
+                
                 list.forEach(item => {
                     const price = Number(item.price).toLocaleString();
                     const imgUrl = item.image || 'https://via.placeholder.com/50';
+                    // جلوگیری از خراب شدن کد HTML با کوتیشن
                     const safeName = item.name.replace(/'/g, "&apos;");
                     const safeDesc = (item.description || "").replace(/'/g, "&apos;");
 
-                    // رنگ ستاره: زرد (ویژه) یا خاکستری
+                    // تنظیمات ظاهری ستاره
                     const starColor = item.is_featured ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400';
-                    const starIcon = item.is_featured ? 'fas' : 'far';
+                    const starIcon = item.is_featured ? 'fas' : 'far'; // توپر یا توخالی
 
                     tableBody.innerHTML += `
-                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
                             <td class="p-4"><img src="${imgUrl}" class="w-10 h-10 rounded object-cover bg-gray-600"></td>
                             <td class="p-4 font-bold text-white">
                                 ${item.name}
-                                ${item.is_featured ? '<span class="text-xs bg-yellow-500 text-black px-1 rounded ml-1">ویژه</span>' : ''}
+                                ${item.is_featured ? '<span class="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded mr-2 font-bold">ویژه</span>' : ''}
                             </td>
                             <td class="p-4 text-sm text-gray-400">${item.category}</td>
-                            <td class="p-4 text-yellow-500 font-bold">${price} تومان</td>
-                            <td class="p-4 flex gap-2 justify-end">
-                                <button onclick="toggleFeature('${item.id}')" class="${starColor} text-lg px-2 transition" title="پیشنهاد ویژه">
+                            <td class="p-4 text-yellow-500 font-bold">${price}</td>
+                            <td class="p-4 flex gap-2 justify-end items-center">
+                                <button onclick="toggleFeature('${item.id}')" class="${starColor} text-lg px-2 transition transform hover:scale-110" title="پیشنهاد سرآشپز">
                                     <i class="${starIcon} fa-star"></i>
                                 </button>
                                 <button onclick="openEditModal('${item.id}', '${safeName}', '${item.category}', '${item.price}', '${item.image||''}', '${safeDesc}')" class="bg-blue-600 px-2 py-1 rounded text-white hover:bg-blue-500"><i class="fas fa-edit"></i></button>
@@ -237,20 +250,52 @@
             } catch (e) { console.error(e); }
         }
 
-        // تابع تغییر ستاره (ویژه بودن)
+        // تغییر وضعیت ستاره
         window.toggleFeature = async (id) => { 
             try {
-                await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' }); 
-                loadMenu(); 
+                const res = await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' });
+                if(res.ok) loadMenu();
+                else alert('خطا در تغییر وضعیت');
             } catch(e){ alert('خطا در ارتباط با سرور'); }
         }
         
-        // افزودن آیتم
+        // افزودن آیتم جدید
         document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = { name: document.getElementById('itemName').value, category: document.getElementById('itemCategory').value, price: document.getElementById('itemPrice').value, description: document.getElementById('itemDesc').value, image: document.getElementById('itemImage').value };
-            await fetch('/api/menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            document.getElementById('addMenuModal').classList.add('hidden'); e.target.reset(); loadMenu();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = 'در حال ذخیره...';
+            btn.disabled = true;
+
+            const data = { 
+                name: document.getElementById('itemName').value, 
+                category: document.getElementById('itemCategory').value, 
+                price: document.getElementById('itemPrice').value, 
+                description: document.getElementById('itemDesc').value, 
+                image: document.getElementById('itemImage').value 
+            };
+
+            try {
+                const res = await fetch('/api/menu', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
+                
+                const result = await res.json();
+                
+                if(res.ok) {
+                    document.getElementById('addMenuModal').classList.add('hidden'); 
+                    e.target.reset(); 
+                    loadMenu();
+                    alert('آیتم با موفقیت اضافه شد');
+                } else {
+                    alert('خطا: ' + (result.error || 'مشکلی پیش آمد'));
+                }
+            } catch(err) { alert('خطای سرور: ' + err.message); }
+            finally {
+                btn.innerText = 'ذخیره';
+                btn.disabled = false;
+            }
         });
 
         // باز کردن مودال ویرایش
@@ -268,38 +313,95 @@
         document.getElementById('editMenuForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('editItemId').value;
-            const data = { name: document.getElementById('editItemName').value, category: document.getElementById('editItemCategory').value, price: document.getElementById('editItemPrice').value, description: document.getElementById('editItemDesc').value, image: document.getElementById('editItemImage').value };
-            await fetch(`/api/menu/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            document.getElementById('editMenuModal').classList.add('hidden'); loadMenu();
+            const data = { 
+                name: document.getElementById('editItemName').value, 
+                category: document.getElementById('editItemCategory').value, 
+                price: document.getElementById('editItemPrice').value, 
+                description: document.getElementById('editItemDesc').value, 
+                image: document.getElementById('editItemImage').value 
+            };
+            
+            try {
+                const res = await fetch(`/api/menu/${id}`, { 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
+                if(res.ok) {
+                    document.getElementById('editMenuModal').classList.add('hidden'); 
+                    loadMenu();
+                } else { alert('خطا در ویرایش'); }
+            } catch(e) { alert('خطای سرور'); }
         });
 
-        window.deleteItem = async (id) => { if(confirm('حذف شود؟')) { await fetch(`/api/menu/${id}`, { method: 'DELETE' }); loadMenu(); } }
+        window.deleteItem = async (id) => { 
+            if(confirm('این آیتم حذف شود؟')) { 
+                await fetch(`/api/menu/${id}`, { method: 'DELETE' }); 
+                loadMenu(); 
+            } 
+        }
 
         // =========================================================
-        // مدیریت گالری
+        // ۳. مدیریت گالری
         // =========================================================
         async function loadGallery() {
-            const list = await (await fetch('/api/gallery')).json();
-            const grid = document.getElementById('gallery-admin-grid'); grid.innerHTML = '';
-            list.forEach(i => grid.innerHTML += `<div class="relative group aspect-square rounded overflow-hidden bg-black"><img src="${i.image}" class="w-full h-full object-cover"><button onclick="deleteGalleryImage('${i.id}')" class="absolute top-1 right-1 bg-red-600 w-6 h-6 rounded flex items-center justify-center text-white"><i class="fas fa-trash text-xs"></i></button></div>`);
+            const container = document.getElementById('gallery-admin-grid');
+            try {
+                const list = await (await fetch('/api/gallery')).json();
+                container.innerHTML = '';
+                list.forEach(i => {
+                    container.innerHTML += `
+                        <div class="relative group aspect-square rounded overflow-hidden bg-black border border-gray-700">
+                            <img src="${i.image}" class="w-full h-full object-cover">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-xs text-center p-1 truncate">${i.caption || ''}</div>
+                            <button onclick="deleteGalleryImage('${i.id}')" class="absolute top-2 right-2 bg-red-600 w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-red-500 shadow-lg transition"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                });
+            } catch(e) { console.error(e); }
         }
-        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{e.preventDefault(); await fetch('/api/gallery', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image:document.getElementById('galleryUrl').value, caption:document.getElementById('galleryCaption').value})}); e.target.reset(); loadGallery();});
-        window.deleteGalleryImage = async(id)=>{if(confirm('حذف عکس؟')){await fetch(`/api/gallery/${id}`, {method:'DELETE'}); loadGallery();}};
+
+        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{
+            e.preventDefault(); 
+            const btn = e.target.querySelector('button');
+            btn.innerText = '...'; btn.disabled = true;
+            
+            try {
+                await fetch('/api/gallery', {
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({
+                        image:document.getElementById('galleryUrl').value, 
+                        caption:document.getElementById('galleryCaption').value
+                    })
+                }); 
+                e.target.reset(); 
+                loadGallery();
+                alert('تصویر اضافه شد');
+            } catch(e) { alert('خطا'); }
+            finally { btn.innerText = 'افزودن'; btn.disabled = false; }
+        });
+
+        window.deleteGalleryImage = async(id)=>{
+            if(confirm('حذف عکس؟')){
+                await fetch(`/api/gallery/${id}`, {method:'DELETE'}); 
+                loadGallery();
+            }
+        };
 
         // =========================================================
-        // تنظیمات تم (رنگ + تصویر پس‌زمینه + مناسبت)
+        // ۴. تنظیمات تم (رنگ + تصویر پس‌زمینه + مناسبت)
         // =========================================================
         async function loadThemeSettings() {
             try {
-                const theme = await (await fetch('/api/theme')).json();
+                const res = await fetch('/api/theme');
+                const theme = await res.json();
+                
                 document.getElementById('primaryColorPicker').value = theme.primary || '#d4af37';
                 document.getElementById('primaryColorText').value = theme.primary || '#d4af37';
                 document.getElementById('bgColorPicker').value = theme.bg || '#0f0f0f';
                 document.getElementById('bgColorText').value = theme.bg || '#0f0f0f';
                 
                 document.getElementById('occasionSelect').value = theme.occasion || 'none';
-                
-                // لود کردن عکس بک‌گراند
                 document.getElementById('heroImageInput').value = theme.heroImage || ''; 
             } catch(e) {}
         }
@@ -310,24 +412,25 @@
                 primary: document.getElementById('primaryColorText').value,
                 bg: document.getElementById('bgColorText').value,
                 occasion: document.getElementById('occasionSelect').value,
-                heroImage: document.getElementById('heroImageInput').value // ذخیره تصویر
+                heroImage: document.getElementById('heroImageInput').value
             };
             await fetch('/api/theme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            alert('تنظیمات ذخیره شد! سایت اصلی را چک کنید.');
+            alert('تنظیمات با موفقیت ذخیره شد!');
         });
 
-        // هماهنگی ورودی‌های رنگ
+        // هماهنگی ورودی‌های رنگ (Color Picker <-> Text Input)
         ['primary', 'bg'].forEach(t => {
             document.getElementById(t+'ColorPicker').addEventListener('input', e => document.getElementById(t+'ColorText').value = e.target.value);
             document.getElementById(t+'ColorText').addEventListener('input', e => document.getElementById(t+'ColorPicker').value = e.target.value);
         });
 
-        // اجرای اولیه
+        // اجرای اولیه توابع
         loadReservations();
         loadMenu();
         loadGallery();
         loadThemeSettings();
 
     </script>
+
 </body>
 </html>
