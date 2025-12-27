@@ -101,4 +101,75 @@
                         renderMenu(items);
                     }
                 } catch (error) {
-                    console.log('Backend not connected or empty, using static
+                    console.log('Backend not connected or empty, using static items.');
+                    // اگر ارور داد (یعنی سرور وصل نیست)، آیتم‌های استاتیک HTML باقی می‌مانند
+                    // فقط سیستم تب‌ها را روی همان استاتیک‌ها فعال می‌کنیم
+                    setupTabs(); 
+                }
+            }
+
+            // 2. تابع رندر کردن آیتم‌ها
+            function renderMenu(items) {
+                menuGrid.innerHTML = ''; // پاک کردن آیتم‌های استاتیک
+                
+                items.forEach(item => {
+                    const price = Number(item.price).toLocaleString();
+                    // اگر عکس نداشت، یک عکس پیش‌فرض می‌گذاریم
+                    const imageSrc = item.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=200';
+                    
+                    const html = `
+                    <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition animate-fade-in" data-category="${item.category}">
+                        <div class="w-24 h-24 rounded overflow-hidden ml-4 flex-shrink-0 bg-gray-700">
+                             <img src="${imageSrc}" class="w-full h-full object-cover" alt="${item.name}">
+                        </div>
+                        <div class="flex flex-col justify-between w-full">
+                            <div>
+                                <h3 class="text-lg font-bold text-white">${item.name}</h3>
+                                <p class="text-xs text-gray-400 mt-1">${item.description || ''}</p>
+                            </div>
+                            <div class="text-left text-gold-500 font-bold">${price} تومان</div>
+                        </div>
+                    </div>
+                    `;
+                    menuGrid.innerHTML += html;
+                });
+
+                setupTabs(); // فعال‌سازی تب‌ها روی آیتم‌های جدید
+            }
+
+            // 3. سیستم تب‌ها (فیلترینگ)
+            function setupTabs() {
+                const tabs = document.querySelectorAll('.menu-tab');
+                const items = document.querySelectorAll('.menu-item');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // مدیریت کلاس اکتیو دکمه‌ها
+                        tabs.forEach(t => {
+                            t.classList.remove('bg-gold-500', 'text-dark-900');
+                            t.classList.add('bg-dark-800', 'text-gray-300');
+                        });
+                        tab.classList.remove('bg-dark-800', 'text-gray-300');
+                        tab.classList.add('bg-gold-500', 'text-dark-900');
+
+                        // فیلتر کردن
+                        const target = tab.getAttribute('data-target');
+                        items.forEach(item => {
+                            if (target === 'all' || item.getAttribute('data-category') === target) {
+                                item.classList.remove('hidden');
+                                item.classList.add('flex');
+                            } else {
+                                item.classList.add('hidden');
+                                item.classList.remove('flex');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // شروع فرآیند
+            await fetchMenu();
+        });
+    </script>
+</body>
+</html>
