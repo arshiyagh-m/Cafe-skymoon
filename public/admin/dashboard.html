@@ -28,9 +28,12 @@
     <main class="flex-1 overflow-y-auto p-8 relative">
         
         <section id="reservations-section" class="tab-content">
-            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-2">رزروهای اخیر</h2>
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
+                <h2 class="text-3xl font-bold text-yellow-500">رزروهای اخیر</h2>
+                <button onclick="loadReservations()" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-sync ml-1"></i>بروزرسانی</button>
+            </div>
             <div id="reservations-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="text-gray-400">در حال بارگذاری...</div>
+                <div class="text-gray-400">در حال دریافت اطلاعات...</div>
             </div>
         </section>
 
@@ -96,75 +99,93 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db, auth, collection, onSnapshot, addDoc, deleteDoc, doc, setDoc, getDoc, signOut, onAuthStateChanged } from '../assets/js/firebase-config.js';
-
-        // ۱. بررسی لاگین بودن کاربر
-        onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = 'login.html';
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = 'login.html');
-        });
-
-        // ۲. تابع تغییر تب‌ها
+    <script>
+        // ۱. تابع تغییر تب‌ها
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId + '-section').classList.remove('hidden');
         }
 
-        // ۳. مدیریت رزروها (Real-time)
-        const resList = document.getElementById('reservations-list');
-        onSnapshot(collection(db, "reservations"), (snapshot) => {
-            resList.innerHTML = '';
-            if(snapshot.empty) {
-                resList.innerHTML = '<p class="text-gray-500">هنوز رزروی ثبت نشده است.</p>';
-                return;
+        // خروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('آیا می‌خواهید خارج شوید؟')) {
+                window.location.href = '../index.html'; // یا صفحه لاگین
             }
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                const card = `
-                    <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative group">
-                        <h3 class="font-bold text-lg text-white mb-2">${data.name}</h3>
-                        <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-2 text-yellow-600"></i> ${data.date} | ساعت ${data.time}</p>
-                        <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-2 text-yellow-600"></i> ${data.guests} نفر</p>
-                        <p class="text-gray-400 text-sm mb-3"><i class="fas fa-phone ml-2 text-yellow-600"></i> ${data.phone}</p>
-                        <div class="flex justify-end mt-2 border-t border-gray-700 pt-2">
-                            <button onclick="deleteRes('${docSnap.id}')" class="text-red-400 text-sm hover:text-red-200 transition flex items-center gap-1"><i class="fas fa-trash"></i> حذف رزرو</button>
-                        </div>
-                    </div>
-                `;
-                resList.innerHTML += card;
-            });
         });
 
-        window.deleteRes = async (id) => {
-            if(confirm('آیا مطمئن هستید که می‌خواهید این رزرو را حذف کنید؟')) await deleteDoc(doc(db, "reservations", id));
+        // =========================================================
+        // ۲. مدیریت رزروها (دریافت از سرور Node.js)
+        // =========================================================
+        async function loadReservations() {
+            const container = document.getElementById('reservations-list');
+            try {
+                const res = await fetch('/api/reservations');
+                if(!res.ok) throw new Error('خطا در ارتباط');
+                const list = await res.json();
+                
+                container.innerHTML = '';
+                if(list.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">هیچ رزروی موجود نیست.</p>';
+                    return;
+                }
+
+                list.forEach(item => {
+                    const card = `
+                        <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative group">
+                            <h3 class="font-bold text-lg text-white mb-2">${item.name}</h3>
+                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-2 text-yellow-600"></i> ${item.date} | ساعت ${item.time}</p>
+                            <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-2 text-yellow-600"></i> ${item.guests}</p>
+                            <p class="text-gray-400 text-sm mb-3"><i class="fas fa-phone ml-2 text-yellow-600"></i> ${item.phone}</p>
+                            <div class="flex justify-end mt-2 border-t border-gray-700 pt-2">
+                                <button onclick="deleteRes('${item._id}')" class="text-red-400 text-sm hover:text-red-200 transition flex items-center gap-1"><i class="fas fa-trash"></i> حذف رزرو</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<p class="text-red-500">خطا در دریافت رزروها</p>';
+            }
         }
 
-        // ۴. مدیریت منو
-        const menuTable = document.getElementById('menu-table-body');
-        
-        onSnapshot(collection(db, "menu"), (snapshot) => {
-            menuTable.innerHTML = '';
-            snapshot.forEach(docSnap => {
-                const item = docSnap.data();
-                // فرمت قیمت سه رقم سه رقم
-                const formattedPrice = Number(item.price).toLocaleString();
-                const row = `
-                    <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                        <td class="p-4 font-bold text-white">${item.name}</td>
-                        <td class="p-4 text-sm text-gray-400">${item.category}</td>
-                        <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
-                        <td class="p-4">
-                            <button onclick="deleteItem('${docSnap.id}')" class="text-red-500 hover:text-red-400 px-2 py-1"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-                menuTable.innerHTML += row;
-            });
-        });
+        window.deleteRes = async (id) => {
+            if(confirm('آیا مطمئن هستید که می‌خواهید این رزرو را حذف کنید؟')) {
+                try {
+                    await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
+                    loadReservations(); // بروزرسانی لیست
+                } catch (e) { alert('خطا در حذف'); }
+            }
+        }
+
+        // =========================================================
+        // ۳. مدیریت منو (دریافت از سرور)
+        // =========================================================
+        async function loadMenu() {
+            const tableBody = document.getElementById('menu-table-body');
+            try {
+                const res = await fetch('/api/menu');
+                const list = await res.json();
+
+                tableBody.innerHTML = '';
+                list.forEach(item => {
+                    const formattedPrice = Number(item.price).toLocaleString();
+                    const row = `
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                            <td class="p-4 font-bold text-white">${item.name}</td>
+                            <td class="p-4 text-sm text-gray-400">${item.category}</td>
+                            <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
+                            <td class="p-4">
+                                <button onclick="deleteItem('${item._id}')" class="text-red-500 hover:text-red-400 px-2 py-1"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
         // افزودن آیتم جدید
         document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
@@ -175,45 +196,73 @@
                 price: document.getElementById('itemPrice').value,
                 description: document.getElementById('itemDesc').value
             };
-            await addDoc(collection(db, "menu"), newItem);
-            document.getElementById('addMenuModal').classList.add('hidden');
-            e.target.reset();
-            alert('آیتم با موفقیت اضافه شد!');
+
+            try {
+                const res = await fetch('/api/menu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newItem)
+                });
+                
+                if(res.ok) {
+                    document.getElementById('addMenuModal').classList.add('hidden');
+                    e.target.reset();
+                    loadMenu(); // بروزرسانی لیست
+                    alert('آیتم با موفقیت اضافه شد!');
+                }
+            } catch(e) { alert('خطا در ذخیره'); }
         });
 
         window.deleteItem = async (id) => {
-            if(confirm('این آیتم از منو حذف شود؟')) await deleteDoc(doc(db, "menu", id));
+            if(confirm('این آیتم از منو حذف شود؟')) {
+                try {
+                    await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+                    loadMenu();
+                } catch(e) { alert('خطا در حذف'); }
+            }
         }
 
-        // ۵. لاجیک تم (Theme Engine)
-        const themeForm = document.getElementById('themeForm');
-        const themeDocRef = doc(db, "settings", "theme");
-        
-        // لود کردن تم فعلی در اینپوت‌ها
-        getDoc(themeDocRef).then(snap => {
-            if(snap.exists()) {
-                const data = snap.data();
-                document.getElementById('primaryColorText').value = data.primary;
-                document.getElementById('primaryColorPicker').value = data.primary;
-                document.getElementById('bgColorText').value = data.bg;
-                document.getElementById('bgColorPicker').value = data.bg;
-            }
-        });
+        // =========================================================
+        // ۴. تنظیمات تم
+        // =========================================================
+        async function loadThemeSettings() {
+            try {
+                const res = await fetch('/api/theme');
+                const theme = await res.json();
+                
+                document.getElementById('primaryColorText').value = theme.primary || '#d4af37';
+                document.getElementById('primaryColorPicker').value = theme.primary || '#d4af37';
+                document.getElementById('bgColorText').value = theme.bg || '#0f0f0f';
+                document.getElementById('bgColorPicker').value = theme.bg || '#0f0f0f';
+            } catch(e) { console.log('Theme default'); }
+        }
 
-        // ذخیره تم جدید
-        themeForm.addEventListener('submit', async (e) => {
+        document.getElementById('themeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const themeData = {
                 primary: document.getElementById('primaryColorText').value,
                 bg: document.getElementById('bgColorText').value
             };
-            await setDoc(themeDocRef, themeData);
+            
+            await fetch('/api/theme', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(themeData)
+            });
             alert('تم جدید اعمال شد! سایت اصلی را چک کنید.');
         });
 
         // هماهنگی اینپوت‌های رنگ
         document.getElementById('primaryColorPicker').addEventListener('input', (e) => document.getElementById('primaryColorText').value = e.target.value);
         document.getElementById('bgColorPicker').addEventListener('input', (e) => document.getElementById('bgColorText').value = e.target.value);
+
+        // =========================================================
+        // اجرای اولیه (Initial Load)
+        // =========================================================
+        // وقتی صفحه لود شد، اطلاعات را بگیر
+        loadReservations();
+        loadMenu();
+        loadThemeSettings();
 
     </script>
 </body>
