@@ -1,0 +1,71 @@
+<main class="mt-24 container mx-auto px-4 mb-16">
+    <h1 class="text-4xl text-center text-gold-500 font-bold mb-8">منوی کافه</h1>
+    
+    <div class="flex overflow-x-auto pb-4 mb-8 gap-2 custom-scrollbar justify-start md:justify-center">
+        <button class="menu-tab active px-6 py-2 bg-gold-500 text-dark-900 rounded-full font-bold whitespace-nowrap transition" data-target="all">همه</button>
+        <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10" data-target="coffee">قهوه</button>
+        <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10" data-target="food">غذا</button>
+        <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10" data-target="cold-drink">نوشیدنی سرد</button>
+        <button class="menu-tab px-6 py-2 bg-dark-800 text-gray-300 rounded-full hover:text-white whitespace-nowrap transition border border-white/10" data-target="hookah">قلیان</button>
+    </div>
+
+    <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="coffee">
+            <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200" class="w-24 h-24 rounded object-cover ml-4" alt="Espresso">
+            <div class="flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="text-lg font-bold text-white">اسپرسو دبل</h3>
+                    <p class="text-xs text-gray-400 mt-1">۱۰۰٪ عربیکا، رست مدیوم</p>
+                </div>
+                <div class="text-left text-gold-500 font-bold">۵۵,۰۰۰ تومان</div>
+            </div>
+        </div>
+
+        <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="food">
+            <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200" class="w-24 h-24 rounded object-cover ml-4" alt="Burger">
+            <div class="flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="text-lg font-bold text-white">ماشروم برگر</h3>
+                    <p class="text-xs text-gray-400 mt-1">۱۵۰ گرم گوشت، سس قارچ، پنیر گودا</p>
+                </div>
+                <div class="text-left text-gold-500 font-bold">۲۲۰,۰۰۰ تومان</div>
+            </div>
+        </div>
+
+         <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="food">
+            <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=200" class="w-24 h-24 rounded object-cover ml-4" alt="Roast Beef">
+            <div class="flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="text-lg font-bold text-white">پنینی رست بیف</h3>
+                    <p class="text-xs text-gray-400 mt-1">گوشت ریش شده، قارچ، پنیر موزارلا، نان چاباتا</p>
+                </div>
+                <div class="text-left text-gold-500 font-bold">۲۸۰,۰۰۰ تومان</div>
+            </div>
+        </div>
+
+        <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="cold-drink">
+            <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" class="w-24 h-24 rounded object-cover ml-4" alt="Mojito">
+            <div class="flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="text-lg font-bold text-white">موکتل موهیتو</h3>
+                    <p class="text-xs text-gray-400 mt-1">لیمو تازه، نعنا، سودا، یخ</p>
+                </div>
+                <div class="text-left text-gold-500 font-bold">۸۵,۰۰۰ تومان</div>
+            </div>
+        </div>
+        
+        <div class="menu-item flex bg-dark-800 rounded-lg p-3 border border-white/5 hover:border-gold-500/30 transition" data-category="hookah">
+            <img src="https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=200" class="w-24 h-24 rounded object-cover ml-4" alt="Hookah">
+            <div class="flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="text-lg font-bold text-white">قلیان عربی</h3>
+                    <p class="text-xs text-gray-400 mt-1">طعم انتخابی، سرویس چای</p>
+                </div>
+                <div class="text-left text-gold-500 font-bold">۳۰۰,۰۰۰ تومان</div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
