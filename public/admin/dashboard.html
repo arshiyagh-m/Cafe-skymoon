@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد مدیریت اسکای مون</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Vazirmatn', sans-serif; }</style>
+</head>
+<body class="bg-gray-900 text-white flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-gray-800 border-l border-gray-700 flex flex-col hidden md:flex">
+        <div class="p-6 text-center border-b border-gray-700">
+            <h1 class="text-xl font-bold text-yellow-500">پنل مدیریت</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-calendar-alt ml-3"></i>رزروهای رسیده</button>
+            <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-utensils ml-3"></i>مدیریت منو</button>
+            <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition"><i class="fas fa-paint-brush ml-3"></i>تغییر تم سایت</button>
+        </nav>
+        <div class="p-4">
+            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded">خروج</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        
+        <section id="reservations-section" class="tab-content">
+            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-2">رزروهای اخیر</h2>
+            <div id="reservations-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="text-gray-400">در حال بارگذاری...</div>
+            </div>
+        </section>
+
+        <section id="menu-section" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
+                <h2 class="text-3xl font-bold text-yellow-500">لیست منو</h2>
+                <button onclick="document.getElementById('addMenuModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-sm font-bold"><i class="fas fa-plus ml-2"></i>افزودن آیتم</button>
+            </div>
+            
+            <div class="overflow-x-auto bg-gray-800 rounded-lg">
+                <table class="w-full text-right">
+                    <thead class="bg-gray-700 text-yellow-500">
+                        <tr>
+                            <th class="p-4">نام آیتم</th>
+                            <th class="p-4">دسته‌بندی</th>
+                            <th class="p-4">قیمت</th>
+                            <th class="p-4">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="theme-section" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-2">تنظیمات ظاهر سایت</h2>
+            <div class="bg-gray-800 p-6 rounded-lg max-w-xl border border-gray-700">
+                <form id="themeForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">رنگ اصلی (Accent Color)</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="color" id="primaryColorPicker" class="h-10 w-10 bg-transparent border-0 cursor-pointer">
+                            <input type="text" id="primaryColorText" class="flex-1 bg-gray-700 rounded p-2 text-white text-left" dir="ltr">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">رنگ پس‌زمینه (تم اصلی)</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="color" id="bgColorPicker" class="h-10 w-10 bg-transparent border-0 cursor-pointer">
+                            <input type="text" id="bgColorText" class="flex-1 bg-gray-700 rounded p-2 text-white text-left" dir="ltr">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded hover:bg-yellow-400 transition">اعمال تغییرات روی سایت</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <div id="addMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600">
+            <h3 class="text-xl font-bold mb-4 text-white">افزودن آیتم جدید</h3>
+            <form id="addMenuForm" class="space-y-3">
+                <input type="text" id="itemName" placeholder="نام غذا/نوشیدنی" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
+                <input type="text" id="itemCategory" placeholder="دسته‌بندی (مثلاً: coffee)" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
+                <input type="number" id="itemPrice" placeholder="قیمت (به تومان)" required class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent">
+                <textarea id="itemDesc" placeholder="مواد تشکیل‌دهنده..." class="w-full bg-gray-700 p-2 rounded text-white focus:outline-none focus:border-yellow-500 border border-transparent"></textarea>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="document.getElementById('addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-500 text-black rounded font-bold hover:bg-yellow-400">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, auth, collection, onSnapshot, addDoc, deleteDoc, doc, setDoc, getDoc, signOut, onAuthStateChanged } from '../assets/js/firebase-config.js';
+
+        // ۱. بررسی لاگین بودن کاربر
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = 'login.html';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'login.html');
+        });
+
+        // ۲. تابع تغییر تب‌ها
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId + '-section').classList.remove('hidden');
+        }
+
+        // ۳. مدیریت رزروها (Real-time)
+        const resList = document.getElementById('reservations-list');
+        onSnapshot(collection(db, "reservations"), (snapshot) => {
+            resList.innerHTML = '';
+            if(snapshot.empty) {
+                resList.innerHTML = '<p class="text-gray-500">هنوز رزروی ثبت نشده است.</p>';
+                return;
+            }
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const card = `
+                    <div class="bg-gray-800 p-4 rounded border-r-4 border-yellow-500 shadow relative group">
+                        <h3 class="font-bold text-lg text-white mb-2">${data.name}</h3>
+                        <p class="text-gray-400 text-sm mb-1"><i class="fas fa-clock ml-2 text-yellow-600"></i> ${data.date} | ساعت ${data.time}</p>
+                        <p class="text-gray-400 text-sm mb-1"><i class="fas fa-users ml-2 text-yellow-600"></i> ${data.guests} نفر</p>
+                        <p class="text-gray-400 text-sm mb-3"><i class="fas fa-phone ml-2 text-yellow-600"></i> ${data.phone}</p>
+                        <div class="flex justify-end mt-2 border-t border-gray-700 pt-2">
+                            <button onclick="deleteRes('${docSnap.id}')" class="text-red-400 text-sm hover:text-red-200 transition flex items-center gap-1"><i class="fas fa-trash"></i> حذف رزرو</button>
+                        </div>
+                    </div>
+                `;
+                resList.innerHTML += card;
+            });
+        });
+
+        window.deleteRes = async (id) => {
+            if(confirm('آیا مطمئن هستید که می‌خواهید این رزرو را حذف کنید؟')) await deleteDoc(doc(db, "reservations", id));
+        }
+
+        // ۴. مدیریت منو
+        const menuTable = document.getElementById('menu-table-body');
+        
+        onSnapshot(collection(db, "menu"), (snapshot) => {
+            menuTable.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const item = docSnap.data();
+                // فرمت قیمت سه رقم سه رقم
+                const formattedPrice = Number(item.price).toLocaleString();
+                const row = `
+                    <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                        <td class="p-4 font-bold text-white">${item.name}</td>
+                        <td class="p-4 text-sm text-gray-400">${item.category}</td>
+                        <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
+                        <td class="p-4">
+                            <button onclick="deleteItem('${docSnap.id}')" class="text-red-500 hover:text-red-400 px-2 py-1"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                menuTable.innerHTML += row;
+            });
+        });
+
+        // افزودن آیتم جدید
+        document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newItem = {
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                price: document.getElementById('itemPrice').value,
+                description: document.getElementById('itemDesc').value
+            };
+            await addDoc(collection(db, "menu"), newItem);
+            document.getElementById('addMenuModal').classList.add('hidden');
+            e.target.reset();
+            alert('آیتم با موفقیت اضافه شد!');
+        });
+
+        window.deleteItem = async (id) => {
+            if(confirm('این آیتم از منو حذف شود؟')) await deleteDoc(doc(db, "menu", id));
+        }
+
+        // ۵. لاجیک تم (Theme Engine)
+        const themeForm = document.getElementById('themeForm');
+        const themeDocRef = doc(db, "settings", "theme");
+        
+        // لود کردن تم فعلی در اینپوت‌ها
+        getDoc(themeDocRef).then(snap => {
+            if(snap.exists()) {
+                const data = snap.data();
+                document.getElementById('primaryColorText').value = data.primary;
+                document.getElementById('primaryColorPicker').value = data.primary;
+                document.getElementById('bgColorText').value = data.bg;
+                document.getElementById('bgColorPicker').value = data.bg;
+            }
+        });
+
+        // ذخیره تم جدید
+        themeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const themeData = {
+                primary: document.getElementById('primaryColorText').value,
+                bg: document.getElementById('bgColorText').value
+            };
+            await setDoc(themeDocRef, themeData);
+            alert('تم جدید اعمال شد! سایت اصلی را چک کنید.');
+        });
+
+        // هماهنگی اینپوت‌های رنگ
+        document.getElementById('primaryColorPicker').addEventListener('input', (e) => document.getElementById('primaryColorText').value = e.target.value);
+        document.getElementById('bgColorPicker').addEventListener('input', (e) => document.getElementById('bgColorText').value = e.target.value);
+
+    </script>
+</body>
+</html>
