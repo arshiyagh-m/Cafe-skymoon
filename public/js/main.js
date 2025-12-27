@@ -1,40 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --------------------------------------------------
+    // =========================================================
     // 1. دریافت و اعمال تم (Theme Engine)
-    // --------------------------------------------------
+    // =========================================================
     async function loadTheme() {
         try {
             const res = await fetch('/api/theme');
-            if (!res.ok) throw new Error('Theme fetch failed');
-            const theme = await res.json();
-            
-            // اعمال رنگ‌ها
-            document.documentElement.style.setProperty('--primary-color', theme.primary);
-            
-            // تغییر بک‌گراند (با حفظ کلاس‌های Tailwind در صورت نیاز)
-            // ما متغیر CSS می‌سازیم تا Tailwind خراب نشود
-            document.documentElement.style.setProperty('--bg-color', theme.bg);
-            document.body.style.backgroundColor = theme.bg;
-
-            // پیدا کردن المنت‌های تکست طلایی و تغییر رنگ آن‌ها بصورت دستی (اختیاری)
-            const goldElements = document.querySelectorAll('.text-gold-500');
-            goldElements.forEach(el => el.style.color = theme.primary);
-
+            if (res.ok) {
+                const theme = await res.json();
+                
+                // تغییر متغیر CSS برای رنگ اصلی
+                document.documentElement.style.setProperty('--primary-color', theme.primary);
+                
+                // تغییر بک‌گراند (اختیاری، اگر نیاز باشد)
+                // document.body.style.backgroundColor = theme.bg;
+            }
         } catch(e) { 
-            console.warn("استفاده از تم پیش‌فرض (ارتباط با سرور برقرار نشد)"); 
+            console.warn("استفاده از تم پیش‌فرض (عدم ارتباط با سرور)"); 
         }
     }
     loadTheme();
 
-    // --------------------------------------------------
+    // =========================================================
     // 2. دریافت منو و راه‌اندازی تب‌ها
-    // --------------------------------------------------
+    // =========================================================
     const menuContainer = document.getElementById('menu-grid');
     
     if (menuContainer) {
-        // نمایش لودینگ قبل از دریافت
-        menuContainer.innerHTML = '<div class="col-span-full text-center text-white py-10">در حال بارگذاری منو...</div>';
+        // نمایش لودینگ
+        menuContainer.innerHTML = '<div class="col-span-full text-center text-white py-10 animate-pulse">در حال دریافت منو...</div>';
 
         fetch('/api/menu')
             .then(res => {
@@ -45,29 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuContainer.innerHTML = ''; // پاک کردن لودینگ
 
                 if (items.length === 0) {
-                    menuContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">آیتمی در منو وجود ندارد.</div>';
+                    menuContainer.innerHTML = '<div class="col-span-full text-center text-gray-500">آیتمی در منو موجود نیست.</div>';
                     return;
                 }
 
                 items.forEach(item => {
-                    // فرمت قیمت
                     const price = Number(item.price).toLocaleString();
+                    // اگر عکس نداشت، یک عکس پیش‌فرض می‌گذاریم
+                    const imgSrc = item.image || 'https://via.placeholder.com/300x200?text=No+Image';
                     
                     const html = `
-                    <div class="menu-item flex flex-col justify-between bg-gray-800 p-4 rounded-lg border border-white/10 hover:border-gold-500/50 transition duration-300" data-category="${item.category}">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-white font-bold text-lg">${item.name}</h3>
-                                <span class="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded">${item.category}</span>
-                            </div>
-                            <p class="text-gray-400 text-sm leading-relaxed">${item.description || ''}</p>
+                    <div class="menu-item flex flex-col bg-dark-800 rounded-lg overflow-hidden border border-white/5 hover:border-gold-500/50 transition duration-300 group" data-category="${item.category}">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${item.name}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                         </div>
-                        <span class="text-gold-500 font-bold text-xl block mt-4 text-left">${price} تومان</span>
+                        
+                        <div class="p-4 flex flex-col flex-grow justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-white font-bold text-lg">${item.name}</h3>
+                                    <span class="text-xs bg-gold-500/10 text-gold-500 px-2 py-1 rounded border border-gold-500/20">${item.category}</span>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed mb-4">${item.description || ''}</p>
+                            </div>
+                            <span class="text-gold-500 font-bold text-xl block text-left dir-ltr">${price} تومان</span>
+                        </div>
                     </div>`;
                     menuContainer.innerHTML += html;
                 });
 
-                // **مهم:** بعد از اینکه آیتم‌ها ساخته شدند، باید سیستم تب‌ها را فعال کنیم
+                // فعال‌سازی تب‌ها بعد از ساخت آیتم‌ها
                 setupMenuTabs();
             })
             .catch(err => {
@@ -85,18 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.addEventListener('click', () => {
                 // استایل دکمه‌ها
                 tabs.forEach(t => {
-                    t.classList.remove('bg-gold-500', 'text-black'); // تغییر رنگ فعال
-                    t.classList.add('bg-gray-800', 'text-white');    // رنگ غیرفعال
+                    t.classList.remove('bg-gold-500', 'text-dark-900');
+                    t.classList.add('bg-dark-800', 'text-gray-300');
                 });
-                tab.classList.remove('bg-gray-800', 'text-white');
-                tab.classList.add('bg-gold-500', 'text-black');
+                tab.classList.remove('bg-dark-800', 'text-gray-300');
+                tab.classList.add('bg-gold-500', 'text-dark-900');
 
                 // فیلتر آیتم‌ها
                 const target = tab.getAttribute('data-target');
                 items.forEach(item => {
                     if (target === 'all' || item.getAttribute('data-category') === target) {
                         item.classList.remove('hidden');
-                        item.classList.add('flex'); // چون display:flex دارند
+                        item.classList.add('flex');
                     } else {
                         item.classList.add('hidden');
                         item.classList.remove('flex');
@@ -106,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --------------------------------------------------
-    // 3. ثبت رزرو (با اعتبارسنجی و لودینگ)
-    // --------------------------------------------------
+    // =========================================================
+    // 3. ثبت رزرو (با فیلدهای کامل)
+    // =========================================================
     const resForm = document.getElementById('reservation-form');
     
     if (resForm) {
@@ -119,19 +121,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const submitBtn = resForm.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn.innerHTML;
             
-            // تغییر وضعیت دکمه به "در حال ارسال"
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ثبت...';
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-            // جمع‌آوری داده‌ها (با استفاده از ID هایی که در HTML باید باشند)
-            // نکته: در HTML حتما باید id="..." را به اینپوت‌ها اضافه کنید
+            // جمع‌آوری تمام داده‌ها (شامل فیلدهای جدید)
             const data = {
                 name: document.getElementById('name')?.value || '',
                 phone: document.getElementById('phone')?.value || '',
                 date: document.getElementById('date')?.value || '',
                 time: document.getElementById('time')?.value || '',
-                guests: document.getElementById('guests')?.value || ''
+                guests: document.getElementById('guests')?.value || '',
+                space: document.getElementById('space')?.value || '', // اضافه شده
+                occasion: document.getElementById('occasion')?.value || '' // اضافه شده
             };
 
             try {
@@ -142,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    alert('رزرو شما با موفقیت ثبت شد! همکاران ما برای تایید با شما تماس می‌گیرند.');
+                    alert('رزرو شما با موفقیت ثبت شد! همکاران ما برای تایید نهایی با شما تماس می‌گیرند.');
                     resForm.reset();
                 } else {
                     alert('مشکلی در ثبت رزرو پیش آمد. لطفا دوباره تلاش کنید.');
@@ -151,11 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Reservation Error:', error);
                 alert('خطای ارتباط با سرور. لطفا اتصال اینترنت را بررسی کنید.');
             } finally {
-                // بازگرداندن دکمه به حالت اول
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnText;
                 submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
             }
+        });
+    }
+
+    // مدیریت منوی موبایل (برای صفحات غیر از ایندکس که ممکن است این کد را جداگانه نداشته باشند)
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if(menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
     }
 });
