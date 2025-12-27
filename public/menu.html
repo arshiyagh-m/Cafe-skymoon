@@ -6,7 +6,7 @@
     <title>منوی کافه اسکای مون</title>
     
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="assets/css/style.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,179 +16,177 @@
                 extend: {
                     fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
                     colors: {
-                        gold: { 500: 'var(--primary-color)', 400: '#fbbf24' },
-                        dark: { 900: '#0f0f0f', 800: '#1a1a1a' }
+                        brand: {
+                            green: '#00b862',
+                            cream: '#f9f5f0',
+                            dark: '#1f1f1f',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 30px -10px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
         }
     </script>
     <style>
-        :root { --primary-color: #d4af37; }
-        body { background-color: #0f0f0f; color: #f3f4f6; }
-        
-        /* مخفی کردن اسکرول بار تب‌ها */
+        body { background-color: #ffffff; color: #333; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+<body class="font-sans leading-relaxed pb-20">
 
-    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2">
-                <span class="text-xl font-bold text-gold-500 tracking-wide">کافه اسکای مون</span>
-            </a>
-            <nav class="hidden md:flex gap-6 text-sm font-medium">
-                <a href="index.html" class="hover:text-gold-500 transition">خانه</a>
-                <a href="menu.html" class="text-gold-500">منو</a>
-                <a href="reservation.html" class="hover:text-gold-500 transition">رزرو میز</a>
-                <a href="gallery.html" class="hover:text-gold-500 transition">گالری</a>
-                <a href="admin/login.html" class="hover:text-gold-500 transition text-xs opacity-50">پنل مدیریت</a>
-            </nav>
-            <a href="index.html" class="md:hidden text-gold-500 text-xl"><i class="fas fa-home"></i></a>
+    <header class="flex justify-between items-center p-5 sticky top-0 bg-white/95 backdrop-blur-sm z-50 shadow-sm">
+        <button class="text-2xl text-gray-700"><i class="fas fa-bars"></i></button>
+        <div class="text-center">
+            <span class="text-xl font-black text-purple-700 tracking-wide">SKYMOON</span>
+            <span class="block text-[10px] text-gray-400 -mt-1 tracking-widest uppercase">Cafe & Restaurant</span>
         </div>
+        <a href="index.html" class="text-xl text-gray-700"><i class="fas fa-arrow-left"></i></a>
     </header>
 
-    <main class="mt-24 container mx-auto px-4 mb-16 flex-grow">
-        <h1 class="text-4xl text-center text-gold-500 font-bold mb-8 border-b border-white/10 pb-4 w-fit mx-auto">منوی کافه</h1>
-        
-        <div id="category-tabs" class="flex overflow-x-auto pb-4 mb-8 gap-3 scrollbar-hide justify-start md:justify-center px-2">
-            <div class="h-10 w-24 bg-dark-800 rounded-full border border-white/5 animate-pulse"></div>
-            <div class="h-10 w-24 bg-dark-800 rounded-full border border-white/5 animate-pulse"></div>
-            <div class="h-10 w-24 bg-dark-800 rounded-full border border-white/5 animate-pulse"></div>
+    <section class="mt-4 px-4">
+        <h2 class="text-lg font-bold mb-4 text-gray-800">دسته‌بندی‌ها</h2>
+        <div id="category-container" class="flex overflow-x-auto gap-3 pb-4 scrollbar-hide snap-x">
+            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
+            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
+            <div class="min-w-[140px] h-[90px] rounded-2xl bg-gray-200 animate-pulse"></div>
         </div>
+    </section>
 
-        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <main class="mt-2 px-4 container mx-auto max-w-2xl">
+        <div id="menu-grid" class="flex flex-col gap-6">
             </div>
     </main>
 
-    <footer class="bg-black py-8 border-t border-white/10 mt-auto">
-        <div class="container mx-auto px-4 text-center">
-            <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
-            <p class="text-gray-500 text-sm mb-4">کیفیت بالا بدون فیلتر</p>
-            <div class="text-gray-600 text-xs">
-                © 2024 طراحی شده برای کافه اسکای مون
-            </div>
-        </div>
-    </footer>
-
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // دریافت تم رنگی
-            try {
-                const theme = await (await fetch('/api/theme')).json();
-                document.documentElement.style.setProperty('--primary-color', theme.primary);
-            } catch(e) {}
-
+            const categoryContainer = document.getElementById('category-container');
             const menuGrid = document.getElementById('menu-grid');
-            const tabsContainer = document.getElementById('category-tabs');
             let allItems = [];
 
-            // دریافت اطلاعات از سرور
-            async function fetchMenu() {
-                try {
-                    const response = await fetch('/api/menu');
-                    if (!response.ok) throw new Error('خطا');
-                    allItems = await response.json();
-                    
-                    if (allItems.length > 0) {
-                        createCategoryButtons(allItems);
-                        renderItems('همه');
-                    } else {
-                        menuGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">منو در حال حاضر خالی است.</p>';
-                        tabsContainer.innerHTML = '';
-                    }
-                } catch (error) {
-                    menuGrid.innerHTML = '<p class="col-span-full text-center text-red-500">خطا در بارگذاری منو</p>';
+            // ۱. دریافت داده‌ها
+            try {
+                const res = await fetch('/api/menu');
+                if(!res.ok) throw new Error();
+                allItems = await res.json();
+                
+                if(allItems.length > 0) {
+                    renderCategories(allItems);
+                    renderItems('همه');
+                } else {
+                    menuGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">منو خالی است.</p>';
+                    categoryContainer.innerHTML = '';
                 }
+            } catch(e) {
+                console.error(e);
+                menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت منو</p>';
             }
 
-            // ساخت دکمه‌ها بر اساس دسته‌بندی‌های موجود در دیتابیس
-            function createCategoryButtons(items) {
-                // استخراج دسته‌های یکتا
-                const categories = ['همه', ...new Set(items.map(item => item.category))];
-                
-                tabsContainer.innerHTML = ''; // پاک کردن لودینگ
+            // ۲. ساخت کارت‌های دسته‌بندی (با عکس آیتم)
+            function renderCategories(items) {
+                const categories = ['همه', ...new Set(items.map(i => i.category))];
+                categoryContainer.innerHTML = '';
 
                 categories.forEach((cat, index) => {
-                    const btn = document.createElement('button');
-                    btn.innerText = cat;
+                    // پیدا کردن عکس برای دسته
+                    let categoryImage = 'https://via.placeholder.com/150'; // عکس پیش‌فرض
                     
-                    // استایل پیش‌فرض (دکمه اول فعال است)
-                    const isActive = index === 0;
-                    btn.className = getBtnClass(isActive);
+                    if (cat === 'همه') {
+                        // برای "همه"، عکس اولین آیتم کل لیست را بردار
+                        if (items.length > 0 && items[0].image) categoryImage = items[0].image;
+                    } else {
+                        // برای سایر دسته‌ها، اولین آیتم همان دسته را پیدا کن
+                        const firstItemInCategory = items.find(i => i.category === cat);
+                        if (firstItemInCategory && firstItemInCategory.image) {
+                            categoryImage = firstItemInCategory.image;
+                        }
+                    }
+
+                    const btn = document.createElement('div');
+                    // اضافه کردن کلاس group برای هاور عکس
+                    btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-gray-100`;
                     
-                    // رویداد کلیک
-                    btn.addEventListener('click', () => {
-                        // غیرفعال کردن همه دکمه‌ها
-                        Array.from(tabsContainer.children).forEach(b => b.className = getBtnClass(false));
-                        // فعال کردن دکمه کلیک شده
-                        btn.className = getBtnClass(true);
+                    btn.innerHTML = `
+                        <img src="${categoryImage}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${cat}">
                         
+                        <div class="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors"></div>
+                        
+                        <div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10">
+                            <span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span>
+                            <span class="text-[10px] bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full mt-1">
+                                ${cat === 'همه' ? items.length : items.filter(i => i.category === cat).length} آیتم
+                            </span>
+                        </div>
+                    `;
+
+                    btn.addEventListener('click', () => {
+                        // انیمیشن انتخاب (بوردر رنگی)
+                        // اول بوردر قبلی‌ها رو پاک کنیم
+                        document.querySelectorAll('#category-container > div').forEach(d => {
+                            d.classList.remove('ring-4', 'ring-brand-green');
+                        });
+                        
+                        btn.classList.add('ring-4', 'ring-brand-green');
                         renderItems(cat);
                     });
 
-                    tabsContainer.appendChild(btn);
+                    // فعال کردن دسته اول به صورت پیش‌فرض
+                    if(index === 0) btn.classList.add('ring-4', 'ring-brand-green');
+
+                    categoryContainer.appendChild(btn);
                 });
             }
 
-            // تابع کمکی برای استایل دکمه‌ها (کپسولی و زیبا)
-            function getBtnClass(isActive) {
-                const base = "px-6 py-2 rounded-full font-bold whitespace-nowrap transition border shadow-md";
-                if (isActive) {
-                    return `${base} bg-gold-500 text-dark-900 border-gold-500 transform scale-105`;
-                } else {
-                    return `${base} bg-dark-800 text-gray-300 border-white/10 hover:border-gold-500 hover:text-white`;
-                }
-            }
-
-            // نمایش آیتم‌ها در صفحه
-            function renderItems(filterCategory) {
+            // ۳. نمایش آیتم‌ها
+            function renderItems(filter) {
                 menuGrid.innerHTML = '';
                 
-                const filtered = filterCategory === 'همه' 
-                    ? allItems 
-                    : allItems.filter(item => item.category === filterCategory);
+                const filtered = filter === 'همه' ? allItems : allItems.filter(i => i.category === filter);
 
                 if(filtered.length === 0) {
-                    menuGrid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10">موردی یافت نشد.</p>';
+                    menuGrid.innerHTML = '<p class="text-center text-gray-400 py-10">موردی یافت نشد.</p>';
                     return;
                 }
 
                 filtered.forEach((item, index) => {
                     const price = Number(item.price).toLocaleString();
-                    const img = item.image || 'https://via.placeholder.com/150';
-                    const delay = index * 50; // تاخیر برای انیمیشن آبشاری
+                    const img = item.image || 'https://via.placeholder.com/300';
+                    const delay = index * 100;
+
+                    const badge = item.is_featured 
+                        ? `<div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-brand-green px-3 py-1 rounded-full text-xs font-bold shadow-sm z-10">ویژه</div>` 
+                        : '';
 
                     const card = `
-                    <div class="flex bg-dark-800 rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/50 transition shadow-lg group animate-fade-in" style="animation-delay: ${delay}ms">
-                        <div class="w-32 h-32 flex-shrink-0 bg-gray-700 relative overflow-hidden">
-                             <img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${item.name}">
-                        </div>
-                        <div class="flex flex-col justify-between w-full p-4">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <h3 class="text-lg font-bold text-white group-hover:text-gold-500 transition">${item.name}</h3>
-                                    ${item.is_featured ? '<i class="fas fa-star text-gold-500 text-xs animate-pulse" title="پیشنهاد ویژه"></i>' : ''}
+                        <div class="bg-brand-cream rounded-[35px] p-6 relative shadow-soft animate-up flex flex-col items-center text-center group" style="animation-delay: ${delay}ms">
+                            ${badge}
+                            
+                            <div class="w-48 h-48 mb-4 relative drop-shadow-xl transition-transform duration-500 group-hover:scale-105">
+                                <img src="${img}" class="w-full h-full object-contain" alt="${item.name}">
+                            </div>
+
+                            <h3 class="text-2xl font-black text-gray-800 mb-2">${item.name}</h3>
+                            
+                            ${item.description ? `<p class="text-gray-500 text-sm mb-6 line-clamp-2 px-2">${item.description}</p>` : '<div class="mb-4"></div>'}
+
+                            <div class="w-full flex justify-between items-center mt-auto px-2 border-t border-black/5 pt-4">
+                                <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-500/20 active:scale-95 text-sm">
+                                    سفارش
+                                </button>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-brand-green font-black text-xl dir-ltr">${price}</span>
+                                    <span class="text-gray-400 text-[10px]">تومان</span>
                                 </div>
-                                <p class="text-xs text-gray-400 mt-1 line-clamp-2">${item.description || ''}</p>
-                            </div>
-                            <div class="flex justify-between items-end mt-2">
-                                <span class="text-[10px] bg-dark-900 text-gray-500 px-2 py-1 rounded border border-white/5">${item.category}</span>
-                                <div class="text-gold-500 font-bold text-lg dir-ltr">${price} <small class="text-xs font-normal text-gray-500">تومان</small></div>
                             </div>
                         </div>
-                    </div>
                     `;
                     menuGrid.innerHTML += card;
                 });
             }
-
-            fetchMenu();
         });
     </script>
 </body>
