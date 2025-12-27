@@ -1,1 +1,5 @@
-.
+{
+  "platform": "node",
+  "app": "cafe-skymoon",
+  "port": 3000
+}
