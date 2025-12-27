@@ -231,8 +231,10 @@
             }
         }
 
+                // ... (کدهای قبلی)
+
         // =========================================================
-        // 3. Menu Management (Add, Edit, Delete)
+        // 3. Menu Management (With Star Feature)
         // =========================================================
         async function loadMenu() {
             const tableBody = document.getElementById('menu-table-body');
@@ -244,22 +246,31 @@
                 list.forEach(item => {
                     const formattedPrice = Number(item.price).toLocaleString();
                     const imgUrl = item.image || 'https://via.placeholder.com/50';
-                    
-                    // Sanitize strings for onclick
                     const safeName = item.name.replace(/'/g, "&apos;");
                     const safeDesc = (item.description || "").replace(/'/g, "&apos;");
+
+                    // تعیین رنگ ستاره (پررنگ اگر ویژه باشد، کمرنگ اگر نباشد)
+                    const starColor = item.is_featured ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400';
+                    const starIcon = item.is_featured ? 'fas' : 'far'; // آیکون توپر یا توخالی
 
                     const row = `
                         <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
                             <td class="p-4">
                                 <img src="${imgUrl}" class="w-10 h-10 rounded object-cover bg-gray-600">
                             </td>
-                            <td class="p-4 font-bold text-white">${item.name}</td>
+                            <td class="p-4 font-bold text-white">
+                                ${item.name}
+                                ${item.is_featured ? '<span class="text-xs bg-yellow-500 text-black px-1 rounded ml-2">ویژه</span>' : ''}
+                            </td>
                             <td class="p-4 text-sm text-gray-400">${item.category}</td>
-                            <td class="p-4 text-yellow-500 font-bold">${formattedPrice} Tomans</td>
+                            <td class="p-4 text-yellow-500 font-bold">${formattedPrice} تومان</td>
                             <td class="p-4 flex gap-2 justify-end">
-                                <button onclick="openEditModal('${item.id}', '${safeName}', '${item.category}', '${item.price}', '${item.image||''}', '${safeDesc}')" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteItem('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 transition" title="Delete"><i class="fas fa-trash"></i></button>
+                                <button onclick="toggleFeature('${item.id}')" class="${starColor} text-lg px-2 transition" title="انتخاب به عنوان پیشنهاد سرآشپز">
+                                    <i class="${starIcon} fa-star"></i>
+                                </button>
+                                
+                                <button onclick="openEditModal('${item.id}', '${safeName}', '${item.category}', '${item.price}', '${item.image||''}', '${safeDesc}')" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition" title="ویرایش"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 transition" title="حذف"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -267,6 +278,21 @@
                 });
             } catch (error) { console.error(error); }
         }
+
+        // تابع جدید: تغییر وضعیت ستاره
+        window.toggleFeature = async (id) => {
+            try {
+                const res = await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' });
+                if (res.ok) {
+                    loadMenu(); // ریلود کردن جدول برای دیدن تغییر رنگ ستاره
+                } else {
+                    alert('خطا در تغییر وضعیت');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // ... (بقیه کدهای addMenuForm, editMenuForm و غیره بدون تغییر)
+
 
         // Add New Item
         document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
