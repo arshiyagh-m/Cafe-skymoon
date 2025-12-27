@@ -278,61 +278,80 @@
             }
 
             // -----------------------------------------------------------
-            // 4. توابع افکت‌های مناسبتی (تزریق CSS و JS)
-            // -----------------------------------------------------------
+                        // ---------------------------------------------------
+            // شروع کد مشترک تم (این بخش را در همه صفحات کپی کنید)
+            // ---------------------------------------------------
             
-            // الف) برف کریسمس
-            function createSnowEffect() {
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .snowflake { position: fixed; top: -10px; color: #fff; font-size: 1.2em; animation: fall linear infinite; z-index: 9999; pointer-events: none; text-shadow: 0 0 5px #fff; }
-                    @keyframes fall { to { transform: translateY(105vh); } }
-                `;
-                document.head.appendChild(style);
-                
-                setInterval(() => {
-                    const flake = document.createElement('div');
-                    flake.classList.add('snowflake');
-                    flake.innerText = '❄';
-                    flake.style.left = Math.random() * 100 + 'vw';
-                    flake.style.animationDuration = Math.random() * 3 + 4 + 's';
-                    flake.style.opacity = Math.random() * 0.7 + 0.3;
-                    document.body.appendChild(flake);
-                    setTimeout(() => flake.remove(), 7000);
-                }, 300);
+            // 1. دریافت تنظیمات از سرور
+            try {
+                const res = await fetch('/api/theme');
+                if(res.ok) {
+                    const theme = await res.json();
+                    applyTheme(theme);
+                }
+            } catch(e) { console.log('Theme Error'); }
+
+            // 2. تابع اعمال تم و مناسبت‌ها
+            function applyTheme(theme) {
+                const root = document.documentElement;
+                const occ = theme.occasion || 'none';
+
+                // اعمال رنگ اصلی انتخاب شده در پنل
+                root.style.setProperty('--primary-color', theme.primary);
+
+                // اعمال عکس پس‌زمینه صفحه اصلی (فقط اگر در صفحه اصلی باشیم)
+                const heroSection = document.getElementById('hero-section');
+                if (heroSection && theme.heroImage && theme.heroImage.trim() !== '') {
+                    heroSection.style.backgroundImage = `url('${theme.heroImage}')`;
+                }
+
+                // اعمال استایل مناسبت‌ها
+                if (occ === 'christmas') {
+                    root.style.setProperty('--primary-color', '#d42f2f'); // قرمز کریسمس
+                    createFallingEffect('❄️');
+                } else if (occ === 'yalda') {
+                    root.style.setProperty('--primary-color', '#b91c1c'); // قرمز اناری
+                    // تغییر رنگ پس‌زمینه هدر برای خوانایی بهتر در تم یلدا
+                    const header = document.querySelector('header');
+                    if(header) { header.classList.remove('bg-dark-900/90'); header.style.backgroundColor = 'rgba(20, 0, 0, 0.9)'; }
+                    createFallingEffect('🍉');
+                } else if (occ === 'valentine') {
+                    root.style.setProperty('--primary-color', '#db2777'); // صورتی
+                    // تغییر رنگ متن‌های خاکستری به صورتی ملایم
+                    document.querySelectorAll('.text-gray-400').forEach(el => el.style.color = '#fce7f3');
+                    createFallingEffect('❤️');
+                } else if (occ === 'nowruz') {
+                    root.style.setProperty('--primary-color', '#10b981'); // سبز
+                    createFallingEffect('🌸');
+                }
             }
 
-            // ب) تم یلدا (قرمز)
-            function createRedTheme() {
-                document.documentElement.style.setProperty('--primary-color', '#e11d48'); 
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    body { background: radial-gradient(circle at center, #2a0a10 0%, #000000 100%) !important; }
-                    .border-gold-500 { border-color: #e11d48 !important; }
-                    .text-gold-500 { color: #e11d48 !important; }
-                `;
-                document.head.appendChild(style);
-            }
+            // 3. تابع بارش (برف، قلب، گل)
+            function createFallingEffect(emoji) {
+                // تزریق CSS لازم برای انیمیشن
+                if (!document.getElementById('fall-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'fall-style';
+                    style.innerHTML = `.falling-item { position: fixed; top: -30px; z-index: 9999; pointer-events: none; animation: fall linear infinite; } @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }`;
+                    document.head.appendChild(style);
+                }
 
-            // ج) تم نوروز (سبز و گل)
-            function createSpringEffect() {
-                document.documentElement.style.setProperty('--primary-color', '#10b981'); 
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .flower { position: fixed; top: -10px; font-size: 1.5em; animation: fallRotate linear infinite; z-index: 9999; pointer-events: none; }
-                    @keyframes fallRotate { to { transform: translateY(105vh) rotate(360deg); } }
-                `;
-                document.head.appendChild(style);
                 setInterval(() => {
-                    const f = document.createElement('div');
-                    f.classList.add('flower');
-                    f.innerText = '🌸';
-                    f.style.left = Math.random() * 100 + 'vw';
-                    f.style.animationDuration = Math.random() * 5 + 4 + 's';
-                    document.body.appendChild(f);
-                    setTimeout(() => f.remove(), 9000);
-                }, 600);
+                    const el = document.createElement('div');
+                    el.classList.add('falling-item');
+                    el.innerText = emoji;
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    el.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+                    el.style.opacity = Math.random();
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 7000);
+                }, 400);
             }
+            
+            // ---------------------------------------------------
+            // پایان کد مشترک تم
+            // ---------------------------------------------------
 
             // د) آیکون گوشه صفحه
             function addCornerDecoration(iconUrl) {
