@@ -277,6 +277,44 @@
                 specialsGrid.innerHTML = '<p class="col-span-3 text-center text-red-500">خطا در بارگذاری منو</p>';
             }
 
+                        // 4. دریافت و نمایش گالری (بر اساس انتخاب ادمین)
+            const galleryGrid = document.getElementById('home-gallery-grid');
+            if (galleryGrid) {
+                try {
+                    const galleryRes = await fetch('/api/gallery');
+                    if (galleryRes.ok) {
+                        const images = await galleryRes.json();
+                        galleryGrid.innerHTML = '';
+                        
+                        // ۱. فیلتر کردن عکس‌هایی که تیک "خانه" دارند
+                        let featuredImages = images.filter(img => img.is_home_featured);
+
+                        // ۲. اگر هیچی انتخاب نشده بود، ۴ تای آخر را نشان بده (به عنوان فال‌بک)
+                        if (featuredImages.length === 0) {
+                            featuredImages = images.slice(0, 4);
+                        }
+
+                        if (featuredImages.length === 0) {
+                            galleryGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">تصویری موجود نیست.</p>';
+                        } else {
+                            featuredImages.forEach(img => {
+                                galleryGrid.innerHTML += `
+                                    <div class="relative group overflow-hidden rounded-lg aspect-square border border-white/10 shadow-lg cursor-pointer">
+                                        <img src="${img.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Gallery">
+                                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center p-2 text-center">
+                                            <p class="text-white text-sm font-bold">${img.caption || ''}</p>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            
+
             // -----------------------------------------------------------
                         // ---------------------------------------------------
             // شروع کد مشترک تم (این بخش را در همه صفحات کپی کنید)
