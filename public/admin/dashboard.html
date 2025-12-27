@@ -241,18 +241,64 @@
             document.getElementById('editMenuModal').classList.add('hidden'); loadMenu();
         });
 
-        // ۵. گالری
-        async function loadGallery() {
-            const l = await (await fetch('/api/gallery')).json();
-            const g = document.getElementById('gallery-admin-grid'); g.innerHTML = '';
-            l.forEach(i => g.innerHTML += `<div class="relative aspect-square bg-black"><img src="${i.image}" class="w-full h-full object-cover"><button onclick="delGal('${i.id}')" class="absolute top-1 right-1 bg-red-600 w-6 h-6 flex items-center justify-center text-white rounded">x</button></div>`);
-        }
-        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{
-            e.preventDefault(); 
+        
+    // =========================================================
+    // ۳. مدیریت گالری (با قابلیت انتخاب برای صفحه اصلی)
+    // =========================================================
+    async function loadGallery() {
+        const container = document.getElementById('gallery-admin-grid');
+        container.innerHTML = '<p class="text-gray-500">در حال دریافت...</p>';
+        
+        try {
+            const list = await (await fetch('/api/gallery')).json();
+            container.innerHTML = '';
+            
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full">عکسی موجود نیست</p>';
+                return;
+            }
+
+            list.forEach(i => {
+                // اگر انتخاب شده باشد، ستاره زرد می‌شود
+                const starClass = i.is_home_featured ? 'text-yellow-400 opacity-100' : 'text-gray-400 opacity-60 hover:opacity-100';
+                
+                container.innerHTML += `
+                    <div class="relative group aspect-square rounded overflow-hidden bg-black border border-gray-700">
+                        <img src="${i.image}" class="w-full h-full object-cover">
+                        
+                        <button onclick="deleteGalleryImage('${i.id}')" class="absolute top-2 right-2 bg-red-600 w-7 h-7 rounded flex items-center justify-center text-white text-xs hover:bg-red-500 z-10"><i class="fas fa-trash"></i></button>
+                        
+                        <button onclick="toggleGalleryHome('${i.id}')" class="absolute bottom-2 left-2 bg-black/70 w-8 h-8 rounded-full flex items-center justify-center ${starClass} transition z-10" title="نمایش در صفحه اصلی">
+                            <i class="fas fa-home"></i>
+                        </button>
+
+                        <div class="absolute bottom-0 left-0 w-full bg-black/60 p-1 text-xs text-center truncate text-white pointer-events-none">${i.caption || ''}</div>
+                    </div>`;
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    // تابع جدید: تغییر وضعیت نمایش در صفحه اصلی
+    window.toggleGalleryHome = async (id) => {
+        try {
+            await fetch(`/api/gallery/${id}/toggle-home`, { method: 'PATCH' });
+            loadGallery(); // رفرش لیست برای دیدن تغییر رنگ آیکون
+        } catch (e) { alert('خطا'); }
+    };
+
+    // ... (بقیه کدهای آپلود و حذف گالری همان قبلی‌ها)
+    document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{
+        e.preventDefault(); 
+        const btn = e.target.querySelector('button'); btn.innerText = '...'; btn.disabled = true;
+        try {
             await fetch('/api/gallery', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ image:document.getElementById('galleryUrl').value, caption:document.getElementById('galleryCaption').value }) }); 
-            e.target.reset(); loadGallery();
-        });
-        window.delGal = async(id) => { if(confirm('حذف؟')) { await fetch(`/api/gallery/${id}`, {method:'DELETE'}); loadGallery(); } }
+            e.target.reset(); loadGallery(); alert('تصویر اضافه شد');
+        } catch(e) { alert('خطا'); }
+        finally { btn.innerText = 'افزودن'; btn.disabled = false; }
+    });
+    window.deleteGalleryImage = async(id)=>{ if(confirm('حذف عکس؟')){ await fetch(`/api/gallery/${id}`, {method:'DELETE'}); loadGallery(); } };
+
+    
 
         // ۶. تم
         async function loadTheme() {
