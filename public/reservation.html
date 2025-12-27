@@ -228,7 +228,7 @@
 
                 try {
                     const res = await fetch('/api/reservations', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-                    if(res.ok) { alert('رزرو با موفقیت ثبت شد!'); form.reset(); }
+                    if(res.ok) { alert('رزرو با موفقیت ثبت شد ! به زودی با شما تماس میگیریم✌️ '); form.reset(); }
                     else alert('خطا در ثبت رزرو');
                 } catch(e) { alert('خطا در ارتباط با سرور'); }
                 finally { btn.disabled = false; btn.innerText = prevText; }
