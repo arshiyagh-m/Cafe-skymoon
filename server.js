@@ -15,7 +15,7 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://user:password
 
 const pool = new Pool({
   connectionString: connectionString,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false // SSL برای لیارا ضروری است
+  ssl: false // <--- تغییر مهم: SSL را کلا خاموش کردیم
 });
 
 // --- ایجاد جدول‌ها (اگر وجود نداشته باشند) ---
