@@ -1,25 +1,204 @@
-<main class="mt-24 container mx-auto px-4 mb-16">
-    <h1 class="text-3xl text-center text-gold-500 font-bold mb-2">گالری تصاویر</h1>
-    <p class="text-center text-gray-400 mb-10">لحظاتی شیرین در کافه اسکای مون</p>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گالری تصاویر | کافه اسکای مون</title>
     
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div class="relative group overflow-hidden rounded-lg aspect-square">
-            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery 1">
-            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                <i class="fas fa-search text-gold-500 text-2xl"></i>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+                    colors: {
+                        gold: { 500: '#d4af37', 400: '#fbbf24' },
+                        dark: { 900: '#0f0f0f', 800: '#1a1a1a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f0f0f; color: #f3f4f6; }
+        
+        /* انیمیشن لودینگ (Skeleton) */
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="font-sans leading-relaxed flex flex-col min-h-screen">
+
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <span class="text-xl font-bold text-gold-500 tracking-wide">کافه اسکای مون</span>
+            </a>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="index.html" class="hover:text-gold-500 transition">خانه</a>
+                <a href="menu.html" class="hover:text-gold-500 transition">منو</a>
+                <a href="reservation.html" class="hover:text-gold-500 transition">رزرو میز</a>
+                <a href="gallery.html" class="text-gold-500">گالری</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mt-24 container mx-auto px-4 mb-16 flex-grow">
+        <h1 class="text-4xl text-center text-gold-500 font-bold mb-2">گالری تصاویر</h1>
+        <p class="text-center text-gray-400 mb-10 text-lg">لحظاتی شیرین در کافه اسکای مون</p>
+        
+        <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            
+            <div class="skeleton aspect-square rounded-lg"></div>
+            <div class="skeleton aspect-square rounded-lg"></div>
+            <div class="skeleton aspect-square rounded-lg"></div>
+            <div class="skeleton aspect-square rounded-lg"></div>
+
+        </div>
+    </main>
+
+    <div id="lightbox" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <button id="close-lightbox" class="absolute top-6 right-6 text-white text-4xl hover:text-gold-500 transition focus:outline-none">&times;</button>
+        
+        <div class="relative max-w-4xl w-full max-h-screen flex flex-col items-center">
+            <img id="lightbox-img" src="" class="max-h-[80vh] w-auto rounded-lg shadow-2xl border border-gold-500/30 object-contain">
+            <p id="lightbox-caption" class="mt-4 text-white text-lg font-medium bg-black/50 px-4 py-2 rounded-full"></p>
+        </div>
+    </div>
+
+    <footer class="bg-black py-8 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-gold-500 font-bold text-xl mb-4">کافه اسکای مون</h3>
+            <p class="text-gray-500 text-sm mb-4">کیفیت بالا بدون فیلتر</p>
+            <div class="text-gray-600 text-xs">
+                © 2024 طراحی شده با عشق
             </div>
         </div>
-        <div class="relative group overflow-hidden rounded-lg aspect-square">
-            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=400" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery 2">
-        </div>
-        <div class="relative group overflow-hidden rounded-lg aspect-square">
-            <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery 3">
-        </div>
-        <div class="relative group overflow-hidden rounded-lg aspect-square">
-            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery 4">
-        </div>
-        <div class="relative group overflow-hidden rounded-lg aspect-square">
-            <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery 5">
-        </div>
-        </div>
-</main>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('gallery-grid');
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxCaption = document.getElementById('lightbox-caption');
+
+            // 1. دریافت تنظیمات تم
+            try {
+                const res = await fetch('/api/theme');
+                if(res.ok) {
+                    const theme = await res.json();
+                    document.documentElement.style.setProperty('--primary-color', theme.primary);
+                }
+            } catch(e) {}
+
+            // 2. دریافت تصاویر از API
+            async function fetchGallery() {
+                try {
+                    const res = await fetch('/api/gallery');
+                    if (!res.ok) throw new Error('API Error');
+                    const images = await res.json();
+                    
+                    grid.innerHTML = ''; // پاک کردن لودینگ
+                    
+                    if (images.length === 0) {
+                        // اگر عکسی نبود، چند عکس استاتیک نمونه نشان بده
+                        renderStaticImages();
+                        return;
+                    }
+
+                    // رندر کردن عکس‌های دیتابیس
+                    images.forEach(img => {
+                        const div = document.createElement('div');
+                        // استفاده از همان کلاس‌هایی که خواسته بودید
+                        div.className = 'relative group overflow-hidden rounded-lg aspect-square cursor-pointer bg-dark-800 border border-white/5';
+                        
+                        // هندل کردن عکس‌های خراب
+                        const imgSrc = img.image || 'https://via.placeholder.com/400?text=No+Image';
+
+                        div.innerHTML = `
+                            <img src="${imgSrc}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery Image" onerror="this.src='https://via.placeholder.com/400?text=Error'">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center backdrop-blur-[1px]">
+                                <i class="fas fa-search-plus text-gold-500 text-3xl transform scale-75 group-hover:scale-100 transition duration-300"></i>
+                            </div>
+                        `;
+
+                        // کلیک برای باز کردن لایت‌باکس
+                        div.addEventListener('click', () => {
+                            lightboxImg.src = imgSrc;
+                            lightboxCaption.innerText = img.caption || '';
+                            // اگر کپشن خالی بود، کادرش را مخفی کن
+                            lightboxCaption.style.display = img.caption ? 'block' : 'none';
+                            lightbox.classList.remove('hidden');
+                        });
+
+                        grid.appendChild(div);
+                    });
+
+                } catch (error) {
+                    console.error('Gallery fetch error:', error);
+                    // در صورت خطا، عکس‌های استاتیک را نشان بده
+                    renderStaticImages();
+                }
+            }
+
+            // تابع کمکی برای نمایش عکس‌های استاتیک (در صورت خالی بودن یا خطا)
+            function renderStaticImages() {
+                const staticImages = [
+                    'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+                    'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=400',
+                    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400',
+                    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400',
+                    'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400'
+                ];
+
+                grid.innerHTML = '';
+                staticImages.forEach(src => {
+                    grid.innerHTML += `
+                        <div class="relative group overflow-hidden rounded-lg aspect-square">
+                            <img src="${src}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" alt="Gallery Static">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fas fa-search text-gold-500 text-2xl"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // بستن لایت‌باکس
+            function closeLightbox() {
+                lightbox.classList.add('hidden');
+                lightboxImg.src = ''; // پاک کردن سورس برای جلوگیری از پرش تصویر بعدی
+            }
+
+            document.getElementById('close-lightbox').addEventListener('click', closeLightbox);
+            
+            // بستن با کلیک روی فضای خالی
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+
+            // بستن با دکمه ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+                    closeLightbox();
+                }
+            });
+
+            // شروع دریافت
+            fetchGallery();
+        });
+    </script>
+</body>
+</html>
