@@ -1,12 +1,140 @@
+/* =========================================
+   1. متغیرهای اصلی (CSS Variables)
+   ========================================= */
 :root {
-    --primary-color: #d4af37; /* Default Gold */
-    --bg-color: #0f0f0f;      /* Default Dark */
+    /* رنگ طلایی پیش‌فرض (توسط پنل ادمین تغییر می‌کند) */
+    --primary-color: #d4af37;
+    
+    /* رنگ پس‌زمینه تیره */
+    --bg-color: #0f0f0f;
+    
+    /* رنگ کارت‌ها و سطوح */
+    --surface-color: #1a1a1a;
+    
+    /* رنگ متن */
+    --text-color: #f3f4f6;
 }
 
+/* =========================================
+   2. تنظیمات پایه (Base Styles)
+   ========================================= */
 body {
     background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Vazirmatn', sans-serif;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی مزاحم */
+    transition: background-color 0.5s ease; /* تغییر نرم تم */
 }
 
-.text-gold, .btn-primary {
-    color: var(--primary-color);
+/* تغییر رنگ انتخاب متن (Selection) برای حس لوکس بودن */
+::selection {
+    background-color: var(--primary-color);
+    color: #000;
+}
+
+/* =========================================
+   3. اسکرول‌بار سفارشی (Custom Scrollbar)
+   ========================================= */
+/* برای مرورگرهای کروم، سافاری و اج */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color); 
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color); 
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b4942b; /* کمی تیره‌تر هنگام هاور */
+}
+
+/* =========================================
+   4. کلاس‌های کمکی (Utility Classes)
+   ========================================= */
+
+/* کلاس برای متن‌هایی که باید رنگ تم داشته باشند */
+.text-gold-dynamic {
+    color: var(--primary-color) !important;
+}
+
+/* کلاس برای دکمه‌ها و پس‌زمینه‌هایی که باید رنگ تم داشته باشند */
+.bg-gold-dynamic {
+    background-color: var(--primary-color) !important;
+}
+
+.border-gold-dynamic {
+    border-color: var(--primary-color) !important;
+}
+
+/* سایه متن برای خوانایی روی عکس */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* =========================================
+   5. انیمیشن‌ها (Animations)
+   ========================================= */
+
+/* انیمیشن فید این (Fade In) برای لود شدن صفحات */
+.animate-fade-in {
+    animation: fadeIn 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* انیمیشن اسکلتون (Skeleton Loading) برای گالری */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--surface-color) 25%,
+        #2a2a2a 50%,
+        var(--surface-color) 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* =========================================
+   6. استایل‌های خاص (Specific Components)
+   ========================================= */
+
+/* تنظیمات منوی تب‌بندی در موبایل */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--surface-color);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+/* افکت روی تصاویر گالری */
+.gallery-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
 }
