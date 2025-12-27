@@ -154,14 +154,14 @@
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">تماس با ما</h3>
-                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-map-marker-alt ml-2 text-gold-500"></i>میاندوآب، کوی سعادت، روبروی جهاد</p>
-                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-phone ml-2 text-gold-500"></i>۰۹۱۹۴۳۵۸۴۰۰</p>
+                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-map-marker-alt ml-2 text-gold-500"></i>آذربایجان غربی،شهرستان میاندوآب،کوی سعادت،بالاتر از فضای سبز،نرسیده به جهاد کشاورزی کافه رستوران اسکای مون</p>
+                <p class="text-gray-400 mb-2 text-sm"><i class="fas fa-phone ml-2 text-gold-500"></i>044-45242793</p>
             </div>
             <div>
                 <h3 class="text-gold-500 font-bold text-xl mb-4">شبکه‌های اجتماعی</h3>
                 <div class="flex justify-center md:justify-start gap-4">
-                    <a href="#" class="text-2xl text-gray-400 hover:text-pink-600 transition"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="text-2xl text-gray-400 hover:text-blue-500 transition"><i class="fab fa-telegram"></i></a>
+                    <a href="https://www.instagram.com/cafe.skymoon?igsh=MXRmb2cyOTN3c3R3YQ==" class="text-2xl text-gray-400 hover:text-pink-600 transition"><i class="fab fa-instagram"></i></a>
+                    
                 </div>
             </div>
         </div>
@@ -218,6 +218,7 @@
             // -----------------------------------------------------------
             // 3. دریافت پیشنهادات سرآشپز (از دیتابیس)
             // -----------------------------------------------------------
+            // 3. دریافت پیشنهادات سرآشپز (آیتم‌های ستاره‌دار)
             const specialsGrid = document.getElementById('specials-grid');
             try {
                 const menuRes = await fetch('/api/menu');
@@ -227,15 +228,26 @@
                     if(menuItems.length > 0) {
                         specialsGrid.innerHTML = ''; // حذف لودینگ
                         
-                        // انتخاب ۳ آیتم اول
-                        const featured = menuItems.slice(0, 3);
+                        // فیلتر کردن آیتم‌هایی که ستاره دارند
+                        let featured = menuItems.filter(item => item.is_featured);
+
+                        // اگر هیچ آیتم ستاره‌داری نبود، به عنوان جایگزین ۳ تای اول را نشان بده
+                        if (featured.length === 0) {
+                            featured = menuItems.slice(0, 3);
+                        }
                         
+                        // نمایش آیتم‌ها (محدود به ۳ تا برای زیبایی طرح، یا همه اگر می‌خواهید)
+                        // اینجا همه ستاره‌دارها را نشان می‌دهیم
                         featured.forEach(item => {
                             const price = Number(item.price).toLocaleString();
                             const imgSrc = item.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600';
                             
                             const html = `
-                                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300 h-full flex flex-col">
+                                <div class="bg-dark-900 rounded-lg overflow-hidden shadow-lg border border-white/5 group hover:border-gold-500/50 transition duration-300 h-full flex flex-col relative">
+                                    <div class="absolute top-4 right-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded shadow-lg z-10">
+                                        <i class="fas fa-star mr-1"></i> پیشنهاد ویژه
+                                    </div>
+
                                     <div class="h-48 overflow-hidden bg-gray-800 relative">
                                         <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${item.name}">
                                         <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition"></div>
@@ -253,7 +265,6 @@
                             specialsGrid.innerHTML += html;
                         });
                     } else {
-                        // فال‌بک (اگر دیتابیس خالی بود)
                         specialsGrid.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-10 border border-white/5 rounded-lg">منوی پیشنهادی به زودی اضافه می‌شود...</p>';
                     }
                 }
