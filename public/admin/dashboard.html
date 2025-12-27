@@ -377,10 +377,14 @@
             await fetch('/api/theme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             alert('تنظیمات ذخیره شد');
         });
-        ['primary'].forEach(t => { 
-            document.getElementById(t+'ColorPicker').addEventListener('input', e => document.getElementById(t+'ColorText').value = e.target.value);
-            document.getElementById(t+'ColorText').addEventListener('input', e => document.getElementById(t+'ColorPicker').value = e.target.value);
-        });
+        
+        // اصلاحیه مهم: فقط برای primaryColorPicker که در HTML وجود دارد لیسنر اضافه می‌کنیم
+        const pColorPicker = document.getElementById('primaryColorPicker');
+        const pColorText = document.getElementById('primaryColorText');
+        if(pColorPicker && pColorText){
+            pColorPicker.addEventListener('input', e => pColorText.value = e.target.value);
+            pColorText.addEventListener('input', e => pColorPicker.value = e.target.value);
+        }
 
         // اجرای اولیه
         loadReservations(); loadMenu(); loadSpaces(); loadGallery(); loadTheme();
