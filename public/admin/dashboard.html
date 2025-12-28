@@ -3,391 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد مدیریت | اسکای مون</title>
+    <title>مدیریت اسکای مون</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/font-face.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Vazirmatn', sans-serif; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
-    </style>
+    <style>body { font-family: 'Vazirmatn', sans-serif; } ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }</style>
 </head>
 <body class="bg-gray-900 text-white flex h-screen overflow-hidden">
 
     <aside class="w-64 bg-gray-800 border-l border-gray-700 flex flex-col hidden md:flex shrink-0">
-        <div class="p-6 text-center border-b border-gray-700">
-            <h1 class="text-xl font-bold text-yellow-500">پنل مدیریت</h1>
-        </div>
+        <div class="p-6 text-center border-b border-gray-700"><h1 class="text-xl font-bold text-yellow-500">پنل مدیریت</h1></div>
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition flex items-center gap-3"><i class="fas fa-calendar-alt w-6"></i>رزروها</button>
-            <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition flex items-center gap-3"><i class="fas fa-utensils w-6"></i>مدیریت منو</button>
-            <button onclick="switchTab('spaces')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition flex items-center gap-3"><i class="fas fa-couch w-6"></i>فضاهای کافه</button>
-            <button onclick="switchTab('gallery')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition flex items-center gap-3"><i class="fas fa-images w-6"></i>گالری تصاویر</button>
-            <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 focus:bg-gray-700 text-gray-300 transition flex items-center gap-3"><i class="fas fa-paint-brush w-6"></i>تنظیمات تم</button>
+            <button onclick="switchTab('reservations')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 text-gray-300 transition"><i class="fas fa-calendar-alt ml-2"></i>رزروها</button>
+            <button onclick="switchTab('menu')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 text-gray-300 transition bg-gray-700"><i class="fas fa-utensils ml-2"></i>مدیریت منو</button>
+            <button onclick="switchTab('spaces')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 text-gray-300 transition"><i class="fas fa-couch ml-2"></i>فضاها</button>
+            <button onclick="switchTab('gallery')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 text-gray-300 transition"><i class="fas fa-images ml-2"></i>گالری</button>
+            <button onclick="switchTab('theme')" class="w-full text-right px-4 py-3 rounded hover:bg-gray-700 text-gray-300 transition"><i class="fas fa-paint-brush ml-2"></i>تنظیمات</button>
         </nav>
-        <div class="p-4 border-t border-gray-700">
-            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded transition shadow-lg">خروج</button>
-        </div>
+        <div class="p-4"><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded">خروج</button></div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-8 relative scroll-smooth">
+    <main class="flex-1 overflow-y-auto p-8 relative">
         
-        <section id="reservations-section" class="tab-content">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                <h2 class="text-3xl font-bold text-yellow-500">رزروهای اخیر</h2>
-                <button onclick="loadReservations()" class="text-sm text-gray-400 hover:text-white flex items-center gap-1"><i class="fas fa-sync"></i>بروزرسانی</button>
-            </div>
-            <div id="reservations-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="text-gray-400">در حال دریافت اطلاعات...</div>
-            </div>
+        <section id="reservations-section" class="tab-content hidden">
+            <h2 class="text-3xl font-bold text-yellow-500 mb-6">رزروهای اخیر <button onclick="loadReservations()" class="text-sm text-gray-400"><i class="fas fa-sync"></i></button></h2>
+            <div id="reservations-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
         </section>
 
-        <section id="menu-section" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                <h2 class="text-3xl font-bold text-yellow-500">لیست منو</h2>
-                <button onclick="document.getElementById('addMenuModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-sm font-bold shadow-lg transition transform hover:-translate-y-1"><i class="fas fa-plus ml-2"></i>افزودن آیتم</button>
+        <section id="menu-section" class="tab-content">
+            
+            <div id="categories-view">
+                <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                    <h2 class="text-3xl font-bold text-yellow-500">دسته‌بندی‌های منو</h2>
+                    <button onclick="document.getElementById('addCategoryModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 font-bold"><i class="fas fa-folder-plus ml-2"></i>دسته‌بندی جدید</button>
+                </div>
+                <div id="categories-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    </div>
             </div>
-            <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-xl border border-gray-700">
-                <table class="w-full text-right">
-                    <thead class="bg-gray-700 text-yellow-500">
-                        <tr>
-                            <th class="p-4">تصویر</th>
-                            <th class="p-4">نام آیتم</th>
-                            <th class="p-4">دسته‌بندی</th>
-                            <th class="p-4">قیمت</th>
-                            <th class="p-4 text-center">عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="menu-table-body" class="divide-y divide-gray-700"></tbody>
-                </table>
+
+            <div id="items-view" class="hidden">
+                <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                    <div class="flex items-center gap-4">
+                        <button onclick="showCategories()" class="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600"><i class="fas fa-arrow-right"></i> بازگشت</button>
+                        <h2 class="text-3xl font-bold text-yellow-500" id="current-category-title">...</h2>
+                    </div>
+                    <button onclick="openAddItemModal()" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 font-bold"><i class="fas fa-plus ml-2"></i>افزودن آیتم به این دسته</button>
+                </div>
+                <div class="overflow-x-auto bg-gray-800 rounded-lg">
+                    <table class="w-full text-right"><tbody id="menu-table-body"></tbody></table>
+                </div>
             </div>
         </section>
 
         <section id="spaces-section" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                <h2 class="text-3xl font-bold text-yellow-500">مدیریت فضاهای کافه</h2>
-                <button onclick="document.getElementById('addSpaceModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-sm font-bold shadow-lg transition transform hover:-translate-y-1"><i class="fas fa-plus ml-2"></i>افزودن فضا</button>
-            </div>
-            <div id="spaces-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div class="flex justify-between mb-6"><h2 class="text-3xl font-bold text-yellow-500">فضاهای کافه</h2><button onclick="document.getElementById('addSpaceModal').classList.remove('hidden')" class="bg-green-600 px-4 py-2 rounded">افزودن</button></div>
+            <div id="spaces-grid" class="grid grid-cols-3 gap-6"></div>
         </section>
 
         <section id="gallery-section" class="tab-content hidden">
-            <div class="bg-gray-800 p-6 rounded-lg mb-8 border border-gray-700 shadow-xl">
-                <h2 class="text-xl font-bold text-yellow-500 mb-4 border-b border-gray-700 pb-2">افزودن تصویر جدید</h2>
-                <form id="uploadGalleryForm" class="flex flex-col md:flex-row gap-4 items-end">
-                    <div class="flex-1 w-full">
-                        <label class="block text-gray-400 text-xs mb-1">لینک تصویر</label>
-                        <input type="url" id="galleryUrl" placeholder="https://..." required class="w-full bg-gray-900 text-white rounded p-2 border border-gray-600 focus:border-yellow-500 focus:outline-none" dir="ltr">
-                    </div>
-                    <div class="flex-1 w-full">
-                        <label class="block text-gray-400 text-xs mb-1">توضیحات</label>
-                        <input type="text" id="galleryCaption" placeholder="توضیح کوتاه" class="w-full bg-gray-900 text-white rounded p-2 border border-gray-600 focus:border-yellow-500 focus:outline-none">
-                    </div>
-                    <button type="submit" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded font-bold shadow-lg w-full md:w-auto">افزودن</button>
-                </form>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-4">تصاویر موجود</h3>
-            <div id="gallery-admin-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            <div class="bg-gray-800 p-6 rounded-lg mb-8"><form id="uploadGalleryForm" class="flex gap-4"><input type="url" id="galleryUrl" placeholder="لینک عکس" class="flex-1 bg-gray-900 rounded p-2"><input type="text" id="galleryCaption" placeholder="توضیح" class="flex-1 bg-gray-900 rounded p-2"><button class="bg-green-600 px-6 rounded">افزودن</button></form></div>
+            <div id="gallery-admin-grid" class="grid grid-cols-5 gap-4"></div>
         </section>
 
         <section id="theme-section" class="tab-content hidden">
-            <h2 class="text-3xl font-bold mb-6 text-yellow-500 border-b border-gray-700 pb-4">تنظیمات ظاهر سایت</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-xl">
-                    <form id="themeForm" class="space-y-6">
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-2">رنگ اصلی (تم)</label>
-                            <div class="flex gap-2">
-                                <input type="color" id="primaryColorPicker" class="h-10 w-10 bg-transparent border-0 cursor-pointer rounded">
-                                <input type="text" id="primaryColorText" class="flex-1 bg-gray-700 rounded p-2 text-white text-left border border-gray-600" dir="ltr">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-yellow-500 mb-2 font-bold"><i class="fas fa-image ml-2"></i>عکس صفحه اصلی (Hero)</label>
-                            <input type="url" id="heroImageInput" placeholder="https://..." class="w-full bg-gray-900 text-white rounded p-3 border border-gray-600 text-left focus:border-yellow-500 focus:outline-none" dir="ltr">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-green-400 mb-2 font-bold"><i class="fas fa-utensils ml-2"></i>عکس پس‌زمینه منو</label>
-                            <input type="url" id="menuBgInput" placeholder="https://..." class="w-full bg-gray-900 text-white rounded p-3 border border-gray-600 text-left focus:border-green-500 focus:outline-none" dir="ltr">
-                        </div>
-                        <div class="border-t border-gray-700 pt-4">
-                            <label class="block text-sm text-yellow-500 mb-2 font-bold"><i class="fas fa-gift ml-2"></i>مناسبت ویژه</label>
-                            <select id="occasionSelect" class="w-full bg-gray-700 text-white p-3 rounded border border-gray-600 focus:border-yellow-500">
-                                <option value="none">ساده (پیش‌فرض)</option>
-                                <option value="christmas">🎄 کریسمس</option>
-                                <option value="yalda">🍉 شب یلدا</option>
-                                <option value="nowruz">🌱 عید نوروز</option>
-                                <option value="valentine">❤️ ولنتاین</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded hover:bg-yellow-400 transition shadow-lg mt-4">ذخیره تنظیمات</button>
-                    </form>
-                </div>
-            </div>
+            <h2 class="text-3xl font-bold text-yellow-500 mb-6">تنظیمات</h2>
+            <form id="themeForm" class="space-y-4 bg-gray-800 p-6 rounded max-w-lg">
+                <div class="flex gap-2"><input type="color" id="primaryColorPicker"><input type="text" id="primaryColorText" class="flex-1 bg-gray-900 p-2 rounded"></div>
+                <input type="url" id="heroImageInput" placeholder="Hero Image" class="w-full bg-gray-900 p-2 rounded">
+                <input type="url" id="menuBgInput" placeholder="Menu BG" class="w-full bg-gray-900 p-2 rounded">
+                <select id="occasionSelect" class="w-full bg-gray-700 p-2 rounded"><option value="none">ساده</option><option value="christmas">کریسمس</option><option value="yalda">یلدا</option><option value="valentine">ولنتاین</option><option value="nowruz">نوروز</option></select>
+                <button class="bg-yellow-500 text-black w-full py-2 rounded">ذخیره</button>
+            </form>
         </section>
     </main>
 
-    <div id="addMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600 shadow-2xl relative">
-            <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">افزودن آیتم منو</h3>
-            <form id="addMenuForm" class="space-y-3">
-                <input type="text" id="itemName" placeholder="نام آیتم" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-yellow-500 focus:outline-none">
-                <input type="text" id="itemCategory" placeholder="دسته (مثلاً: coffee)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-yellow-500 focus:outline-none">
-                <input type="number" id="itemPrice" placeholder="قیمت (تومان)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-yellow-500 focus:outline-none">
-                <input type="url" id="itemImage" placeholder="لینک عکس (اختیاری)" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600 focus:border-yellow-500 focus:outline-none" dir="ltr">
-                <textarea id="itemDesc" placeholder="توضیحات..." class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-yellow-500 focus:outline-none"></textarea>
-                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-gray-700">
-                    <button type="button" onclick="document.getElementById('addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
-                    <button type="submit" class="px-6 py-2 bg-yellow-500 text-black rounded font-bold hover:bg-yellow-400">ذخیره</button>
+    <div id="addCategoryModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600">
+            <h3 class="text-xl font-bold mb-4">افزودن دسته‌بندی</h3>
+            <form id="addCategoryForm" class="space-y-3">
+                <input type="text" id="catName" placeholder="نام دسته (مثلاً: نوشیدنی گرم)" required class="w-full bg-gray-700 p-2 rounded text-white">
+                <input type="url" id="catImage" placeholder="لینک عکس دسته" required class="w-full bg-gray-700 p-2 rounded text-white text-left" dir="ltr">
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="this.closest('#addCategoryModal').classList.add('hidden')" class="px-4 py-2 text-gray-400">لغو</button>
+                    <button type="submit" class="px-6 py-2 bg-green-600 rounded font-bold">ذخیره</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="editMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-yellow-500 shadow-2xl relative">
-            <h3 class="text-xl font-bold mb-4 text-yellow-500 border-b border-gray-700 pb-2">ویرایش آیتم</h3>
+    <div id="addMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600">
+            <h3 class="text-xl font-bold mb-4">افزودن آیتم</h3>
+            <form id="addMenuForm" class="space-y-3">
+                <input type="hidden" id="itemCategoryFixed"> <input type="text" id="itemName" placeholder="نام آیتم" required class="w-full bg-gray-700 p-2 rounded text-white">
+                <input type="number" id="itemPrice" placeholder="قیمت" required class="w-full bg-gray-700 p-2 rounded text-white">
+                <input type="url" id="itemImage" placeholder="لینک عکس" class="w-full bg-gray-900 p-2 rounded text-white text-left" dir="ltr">
+                <textarea id="itemDesc" placeholder="توضیحات" class="w-full bg-gray-700 p-2 rounded text-white"></textarea>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="this.closest('#addMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400">لغو</button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 rounded font-bold">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editMenuModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-yellow-500">
+            <h3 class="text-xl font-bold mb-4 text-yellow-500">ویرایش آیتم</h3>
             <form id="editMenuForm" class="space-y-3">
                 <input type="hidden" id="editItemId">
-                <label class="text-xs text-gray-400">نام:</label>
-                <input type="text" id="editItemName" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <label class="text-xs text-gray-400">دسته:</label>
-                <input type="text" id="editItemCategory" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <label class="text-xs text-gray-400">قیمت:</label>
-                <input type="number" id="editItemPrice" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600">
-                <label class="text-xs text-gray-400">لینک عکس:</label>
-                <input type="url" id="editItemImage" class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600" dir="ltr">
-                <label class="text-xs text-gray-400">توضیحات:</label>
-                <textarea id="editItemDesc" class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600"></textarea>
-                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-gray-700">
-                    <button type="button" onclick="document.getElementById('editMenuModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
-                    <button type="submit" class="px-6 py-2 bg-yellow-600 text-black rounded font-bold hover:bg-yellow-500">بروزرسانی</button>
-                </div>
+                <input type="text" id="editItemName" required class="w-full bg-gray-700 p-2 rounded text-white">
+                <input type="hidden" id="editItemCategory"> <input type="number" id="editItemPrice" required class="w-full bg-gray-700 p-2 rounded text-white">
+                <input type="url" id="editItemImage" class="w-full bg-gray-900 p-2 rounded text-white text-left" dir="ltr">
+                <textarea id="editItemDesc" class="w-full bg-gray-700 p-2 rounded text-white"></textarea>
+                <button type="submit" class="w-full bg-yellow-600 py-2 rounded font-bold mt-4">بروزرسانی</button>
+                <button type="button" onclick="this.closest('#editMenuModal').classList.add('hidden')" class="w-full text-gray-400 mt-2">لغو</button>
             </form>
         </div>
     </div>
 
-    <div id="addSpaceModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-gray-800 p-6 rounded-lg w-96 border border-gray-600 shadow-2xl relative">
-            <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">افزودن فضای جدید</h3>
-            <form id="addSpaceForm" class="space-y-3">
-                <input type="text" id="spaceName" placeholder="نام فضا (مثلاً: VIP)" required class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-green-500 focus:outline-none">
-                <textarea id="spaceDesc" placeholder="توضیحات کوتاه..." class="w-full bg-gray-700 p-2 rounded text-white border border-gray-600 focus:border-green-500 focus:outline-none"></textarea>
-                <input type="url" id="spaceImage" placeholder="لینک تصویر" required class="w-full bg-gray-900 p-2 rounded text-white text-left border border-gray-600 focus:border-green-500 focus:outline-none" dir="ltr">
-                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-gray-700">
-                    <button type="button" onclick="document.getElementById('addSpaceModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white">لغو</button>
-                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-500">ذخیره</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div id="addSpaceModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50"><div class="bg-gray-800 p-6 rounded w-96"><form id="addSpaceForm" class="space-y-3"><input id="spaceName" placeholder="نام فضا" class="w-full bg-gray-700 p-2 rounded text-white"><textarea id="spaceDesc" placeholder="توضیح" class="w-full bg-gray-700 p-2 rounded text-white"></textarea><input id="spaceImage" placeholder="عکس" class="w-full bg-gray-700 p-2 rounded text-white"><button class="bg-green-600 w-full p-2 rounded text-white">ذخیره</button><button type="button" onclick="this.closest('#addSpaceModal').classList.add('hidden')" class="text-gray-400 w-full mt-2 text-center block">لغو</button></form></div></div>
 
     <script>
-        // احراز هویت
-        const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
-        if (isLoggedIn !== 'true') window.location.href = "login.html";
-        document.getElementById('logoutBtn').addEventListener('click', () => { 
-            if(confirm('آیا مطمئنید؟')) { localStorage.removeItem('isAdminLoggedIn'); window.location.href = 'login.html'; }
+        const isLoggedIn = localStorage.getItem('isAdminLoggedIn'); if(isLoggedIn!=='true') window.location.href="login.html";
+        document.getElementById('logoutBtn').addEventListener('click',()=>{if(confirm('خروج؟')){localStorage.removeItem('isAdminLoggedIn');window.location.href='login.html';}});
+        
+        window.switchTab = (id) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
+        }
+
+        let currentCategory = ''; // متغیر برای نگهداری دسته‌بندی فعلی
+
+        // ================== CATEGORIES & MENU LOGIC ==================
+        
+        // 1. بارگذاری دسته‌بندی‌ها
+        async function loadCategories() {
+            const grid = document.getElementById('categories-grid');
+            grid.innerHTML = '<p class="text-gray-500">در حال دریافت...</p>';
+            try {
+                const res = await fetch('/api/categories');
+                const cats = await res.json();
+                grid.innerHTML = '';
+                
+                cats.forEach(c => {
+                    grid.innerHTML += `
+                        <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-yellow-500 transition cursor-pointer relative group" onclick="openCategory('${c.name}')">
+                            <img src="${c.image || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover">
+                            <div class="p-3 text-center">
+                                <h3 class="font-bold text-lg">${c.name}</h3>
+                            </div>
+                            <button onclick="event.stopPropagation(); deleteCategory('${c.id}')" class="absolute top-2 left-2 bg-red-600 p-1.5 rounded text-white opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            } catch(e) { grid.innerHTML = '<p class="text-red-500">خطا</p>'; }
+        }
+
+        // 2. افزودن دسته‌بندی
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = { name: document.getElementById('catName').value, image: document.getElementById('catImage').value };
+            await fetch('/api/categories', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            document.getElementById('addCategoryModal').classList.add('hidden'); e.target.reset(); loadCategories();
         });
 
-        // تغییر تب‌ها
-        window.switchTab = (tabId) => {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(tabId + '-section').classList.remove('hidden');
-        }
+        // 3. حذف دسته‌بندی
+        window.deleteCategory = async (id) => {
+            if(confirm('هشدار: با حذف دسته، تمام آیتم‌های داخل آن هم حذف می‌شوند! ادامه می‌دهید؟')) {
+                await fetch(`/api/categories/${id}`, { method: 'DELETE' }); loadCategories();
+            }
+        };
 
-        // ================== RESERVATIONS ==================
-        async function loadReservations() {
-            const container = document.getElementById('reservations-list');
-            try {
-                const res = await fetch('/api/reservations');
-                const list = await res.json();
-                container.innerHTML = '';
-                if(list.length === 0) { container.innerHTML = '<p class="text-gray-500 col-span-full text-center">هیچ رزروی موجود نیست.</p>'; return; }
-                
-                list.forEach(i => {
-                    container.innerHTML += `
-                    <div class="bg-gray-800 p-4 border-r-4 border-yellow-500 rounded relative shadow-lg">
-                        <h3 class="font-bold text-lg text-white">${i.name}</h3>
-                        <p class="text-yellow-500 font-bold my-1">${i.space || 'عمومی'}</p>
-                        <p class="text-sm text-gray-400"><i class="fas fa-clock ml-1"></i> ${i.date} | ${i.time}</p>
-                        <p class="text-sm text-gray-400 mt-1"><i class="fas fa-users ml-1"></i> ${i.guests} نفر | ${i.phone}</p>
-                        <p class="text-xs text-gray-500 mt-2 italic">${i.occasion || 'بدون مناسبت'}</p>
-                        <button onclick="deleteRes('${i.id}')" class="absolute top-4 left-4 text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                    </div>`;
-                });
-            } catch (e) { container.innerHTML = '<p class="text-red-500">خطا در دریافت</p>'; }
-        }
-        window.deleteRes = async (id) => { if(confirm('حذف شود؟')) { await fetch(`/api/reservations/${id}`, { method: 'DELETE' }); loadReservations(); } }
+        // 4. باز کردن یک دسته (نمایش آیتم‌ها)
+        window.openCategory = (catName) => {
+            currentCategory = catName;
+            document.getElementById('categories-view').classList.add('hidden');
+            document.getElementById('items-view').classList.remove('hidden');
+            document.getElementById('current-category-title').innerText = catName;
+            loadItems(catName);
+        };
 
-        // ================== MENU ==================
-        async function loadMenu() {
+        window.showCategories = () => {
+            document.getElementById('items-view').classList.add('hidden');
+            document.getElementById('categories-view').classList.remove('hidden');
+            loadCategories();
+        };
+
+        // 5. بارگذاری آیتم‌های یک دسته
+        async function loadItems(catName) {
             const tbody = document.getElementById('menu-table-body');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">در حال دریافت...</td></tr>';
             try {
-                const res = await fetch('/api/menu');
-                const list = await res.json();
+                // ارسال کوئری به سرور برای فیلتر کردن
+                const res = await fetch(`/api/menu?category=${encodeURIComponent(catName)}`);
+                const items = await res.json();
                 tbody.innerHTML = '';
-                list.forEach(i => {
+                
+                if(items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">هیچ آیتمی در این دسته نیست.</td></tr>';
+                    return;
+                }
+
+                items.forEach(i => {
                     const price = Number(i.price).toLocaleString();
-                    const sName = i.name.replace(/'/g, "&apos;");
-                    const sDesc = (i.description || "").replace(/'/g, "&apos;");
-                    const starClass = i.is_featured ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400';
+                    const starClass = i.is_featured ? 'text-yellow-400' : 'text-gray-600';
+                    const safeName = i.name.replace(/'/g, "&apos;"); 
+                    const safeDesc = (i.description || "").replace(/'/g, "&apos;");
 
                     tbody.innerHTML += `
-                        <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                            <td class="p-4"><img src="${i.image||''}" class="w-12 h-12 rounded-lg object-cover bg-gray-600 border border-gray-600"></td>
-                            <td class="p-4 font-bold text-white">${i.name} ${i.is_featured ? '<span class="text-xs bg-yellow-500 text-black px-1 rounded ml-1">ویژه</span>':''}</td>
-                            <td class="p-4 text-sm text-gray-400">${i.category}</td>
-                            <td class="p-4 text-yellow-500 font-bold">${price}</td>
-                            <td class="p-4 flex gap-3 justify-center">
-                                <button onclick="toggleFeature('${i.id}')" class="${starClass} text-lg transition" title="ویژه"><i class="fas fa-star"></i></button>
-                                <button onclick="openEditMenu('${i.id}','${sName}','${i.category}','${i.price}','${i.image||''}','${sDesc}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteMenu('${i.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="p-3"><img src="${i.image||''}" class="w-10 h-10 rounded object-cover"></td>
+                            <td class="p-3 font-bold">${i.name}</td>
+                            <td class="p-3 text-sm text-gray-400">${i.category}</td>
+                            <td class="p-3 text-yellow-500">${price}</td>
+                            <td class="p-3 flex justify-center gap-2">
+                                <button onclick="toggleFeature('${i.id}')" class="${starClass}"><i class="fas fa-star"></i></button>
+                                <button onclick="openEditMenu('${i.id}','${safeName}','${i.price}','${i.image||''}','${safeDesc}')" class="text-blue-400"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteMenu('${i.id}')" class="text-red-500"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
                 });
-            } catch (e) {}
+            } catch(e) {}
         }
-        window.toggleFeature = async (id) => { await fetch(`/api/menu/${id}/toggle-feature`, { method: 'PATCH' }); loadMenu(); }
-        window.deleteMenu = async (id) => { if(confirm('حذف شود؟')) { await fetch(`/api/menu/${id}`, { method: 'DELETE' }); loadMenu(); } }
+
+        // 6. افزودن آیتم به دسته فعلی
+        window.openAddItemModal = () => {
+            document.getElementById('itemCategoryFixed').value = currentCategory; // ست کردن دسته
+            document.getElementById('addMenuModal').classList.remove('hidden');
+        };
 
         document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = { 
-                name: document.getElementById('itemName').value, 
-                category: document.getElementById('itemCategory').value, 
-                price: document.getElementById('itemPrice').value, 
-                description: document.getElementById('itemDesc').value, 
-                image: document.getElementById('itemImage').value 
+            const data = {
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategoryFixed').value, // استفاده از دسته ثابت
+                price: document.getElementById('itemPrice').value,
+                description: document.getElementById('itemDesc').value,
+                image: document.getElementById('itemImage').value
             };
-            await fetch('/api/menu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            document.getElementById('addMenuModal').classList.add('hidden'); 
-            e.target.reset(); loadMenu();
+            await fetch('/api/menu', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            document.getElementById('addMenuModal').classList.add('hidden'); e.target.reset(); loadItems(currentCategory);
         });
 
-        window.openEditMenu = (id, n, c, p, i, d) => {
+        // 7. سایر عملیات منو (حذف، ویرایش، ستاره)
+        window.deleteMenu = async (id) => { if(confirm('حذف؟')) { await fetch(`/api/menu/${id}`, {method:'DELETE'}); loadItems(currentCategory); } };
+        window.toggleFeature = async (id) => { await fetch(`/api/menu/${id}/toggle-feature`, {method:'PATCH'}); loadItems(currentCategory); };
+        
+        window.openEditMenu = (id, n, p, i, d) => {
             document.getElementById('editItemId').value = id;
             document.getElementById('editItemName').value = n;
-            document.getElementById('editItemCategory').value = c;
             document.getElementById('editItemPrice').value = p;
             document.getElementById('editItemImage').value = i;
             document.getElementById('editItemDesc').value = d;
+            document.getElementById('editItemCategory').value = currentCategory; // Keep category same
             document.getElementById('editMenuModal').classList.remove('hidden');
         };
-        document.getElementById('editMenuForm').addEventListener('submit', async (e) => {
+        document.getElementById('editMenuForm').addEventListener('submit', async(e)=>{
             e.preventDefault();
             const id = document.getElementById('editItemId').value;
-            const data = { 
-                name: document.getElementById('editItemName').value, 
-                category: document.getElementById('editItemCategory').value, 
-                price: document.getElementById('editItemPrice').value, 
-                description: document.getElementById('editItemDesc').value, 
-                image: document.getElementById('editItemImage').value 
-            };
-            await fetch(`/api/menu/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            document.getElementById('editMenuModal').classList.add('hidden'); loadMenu();
-        });
-
-        // ================== SPACES ==================
-        async function loadSpaces() {
-            const grid = document.getElementById('spaces-grid');
-            try {
-                const res = await fetch('/api/spaces');
-                const list = await res.json();
-                grid.innerHTML = '';
-                list.forEach(s => {
-                    grid.innerHTML += `
-                        <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 relative group shadow-lg">
-                            <img src="${s.image}" class="w-full h-40 object-cover">
-                            <div class="p-4">
-                                <h3 class="font-bold text-lg text-white">${s.name}</h3>
-                                <p class="text-sm text-gray-400 mt-1 line-clamp-2">${s.description || ''}</p>
-                            </div>
-                            <button onclick="deleteSpace('${s.id}')" class="absolute top-2 left-2 bg-red-600 w-8 h-8 flex items-center justify-center rounded text-white shadow hover:bg-red-500 transition"><i class="fas fa-trash"></i></button>
-                        </div>`;
-                });
-            } catch(e){}
-        }
-        document.getElementById('addSpaceForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = { 
-                name: document.getElementById('spaceName').value, 
-                description: document.getElementById('spaceDesc').value, 
-                image: document.getElementById('spaceImage').value 
-            };
-            await fetch('/api/spaces', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            document.getElementById('addSpaceModal').classList.add('hidden'); e.target.reset(); loadSpaces();
-        });
-        window.deleteSpace = async(id) => { if(confirm('حذف فضا؟')) { await fetch(`/api/spaces/${id}`, {method:'DELETE'}); loadSpaces(); } };
-
-        // ================== GALLERY ==================
-        async function loadGallery() {
-            const grid = document.getElementById('gallery-admin-grid');
-            try {
-                const list = await (await fetch('/api/gallery')).json();
-                grid.innerHTML = '';
-                if(list.length === 0) grid.innerHTML = '<p class="col-span-full text-gray-500">عکسی نیست.</p>';
-                list.forEach(i => {
-                    const homeClass = i.is_home_featured ? 'text-yellow-400 opacity-100' : 'text-gray-400 opacity-60 hover:opacity-100';
-                    grid.innerHTML += `
-                        <div class="relative group aspect-square rounded-lg overflow-hidden bg-black border border-gray-700 shadow-md">
-                            <img src="${i.image}" class="w-full h-full object-cover">
-                            <button onclick="deleteGallery('${i.id}')" class="absolute top-2 right-2 bg-red-600 w-7 h-7 flex items-center justify-center text-white rounded hover:bg-red-500 shadow z-10"><i class="fas fa-trash text-xs"></i></button>
-                            <button onclick="toggleGalleryHome('${i.id}')" class="absolute bottom-2 left-2 bg-black/70 w-8 h-8 flex items-center justify-center rounded-full ${homeClass} transition z-10" title="نمایش در خانه"><i class="fas fa-home"></i></button>
-                            <div class="absolute bottom-0 w-full bg-black/60 p-1 text-xs text-center truncate pointer-events-none">${i.caption || ''}</div>
-                        </div>`;
-                });
-            } catch(e){}
-        }
-        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{
-            e.preventDefault(); 
-            const btn = e.target.querySelector('button'); btn.innerText = '...'; btn.disabled = true;
-            try {
-                await fetch('/api/gallery', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ image:document.getElementById('galleryUrl').value, caption:document.getElementById('galleryCaption').value }) }); 
-                e.target.reset(); loadGallery();
-            } catch(e) { alert('خطا'); }
-            finally { btn.innerText = 'افزودن'; btn.disabled = false; }
-        });
-        window.deleteGallery = async(id) => { if(confirm('حذف؟')) { await fetch(`/api/gallery/${id}`, {method:'DELETE'}); loadGallery(); } };
-        window.toggleGalleryHome = async(id) => { await fetch(`/api/gallery/${id}/toggle-home`, { method: 'PATCH' }); loadGallery(); };
-
-        // ================== THEME ==================
-        async function loadTheme() {
-            try {
-                const t = await (await fetch('/api/theme')).json();
-                document.getElementById('primaryColorPicker').value = t.primary || '#d4af37';
-                document.getElementById('primaryColorText').value = t.primary || '#d4af37';
-                document.getElementById('heroImageInput').value = t.heroImage || '';
-                document.getElementById('menuBgInput').value = t.menuBg || '';
-                document.getElementById('occasionSelect').value = t.occasion || 'none';
-            } catch(e) {}
-        }
-        document.getElementById('themeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
             const data = {
-                primary: document.getElementById('primaryColorText').value,
-                bg: '#0f0f0f',
-                occasion: document.getElementById('occasionSelect').value,
-                heroImage: document.getElementById('heroImageInput').value,
-                menuBg: document.getElementById('menuBgInput').value
+                name: document.getElementById('editItemName').value,
+                category: document.getElementById('editItemCategory').value,
+                price: document.getElementById('editItemPrice').value,
+                description: document.getElementById('editItemDesc').value,
+                image: document.getElementById('editItemImage').value
             };
-            await fetch('/api/theme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            alert('تنظیمات ذخیره شد');
+            await fetch(`/api/menu/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            document.getElementById('editMenuModal').classList.add('hidden'); loadItems(currentCategory);
         });
-        
-        // اصلاحیه مهم: فقط برای primaryColorPicker که در HTML وجود دارد لیسنر اضافه می‌کنیم
-        const pColorPicker = document.getElementById('primaryColorPicker');
-        const pColorText = document.getElementById('primaryColorText');
-        if(pColorPicker && pColorText){
-            pColorPicker.addEventListener('input', e => pColorText.value = e.target.value);
-            pColorText.addEventListener('input', e => pColorPicker.value = e.target.value);
-        }
 
-        // اجرای اولیه
-        loadReservations(); loadMenu(); loadSpaces(); loadGallery(); loadTheme();
+
+        // ================== OTHER TABS (Standard) ==================
+        
+        // Spaces
+        async function loadSpaces() { const g=document.getElementById('spaces-grid'); const l=await(await fetch('/api/spaces')).json(); g.innerHTML=''; l.forEach(s=>{ g.innerHTML+=`<div class="bg-gray-800 rounded border border-gray-700 relative group"><img src="${s.image}" class="w-full h-32 object-cover"><div class="p-3"><h3 class="font-bold">${s.name}</h3></div><button onclick="delSpace('${s.id}')" class="absolute top-2 left-2 bg-red-600 p-1 rounded text-white"><i class="fas fa-trash"></i></button></div>`; }); }
+        document.getElementById('addSpaceForm').addEventListener('submit', async(e)=>{ e.preventDefault(); await fetch('/api/spaces',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('spaceName').value, description:document.getElementById('spaceDesc').value, image:document.getElementById('spaceImage').value})}); document.getElementById('addSpaceModal').classList.add('hidden'); e.target.reset(); loadSpaces(); });
+        window.delSpace=async(id)=>{if(confirm('حذف؟')){await fetch(`/api/spaces/${id}`,{method:'DELETE'});loadSpaces();}}
+
+        // Gallery
+        async function loadGallery() { const g=document.getElementById('gallery-admin-grid'); const l=await(await fetch('/api/gallery')).json(); g.innerHTML=''; l.forEach(i=>{ const c=i.is_home_featured?'text-yellow-400':'text-gray-400'; g.innerHTML+=`<div class="relative group aspect-square bg-black border border-gray-700"><img src="${i.image}" class="w-full h-full object-cover"><button onclick="delGal('${i.id}')" class="absolute top-1 right-1 bg-red-600 w-6 h-6 flex items-center justify-center text-white rounded">x</button><button onclick="togGal('${i.id}')" class="absolute bottom-1 left-1 ${c}"><i class="fas fa-home"></i></button></div>`; }); }
+        document.getElementById('uploadGalleryForm').addEventListener('submit', async(e)=>{ e.preventDefault(); await fetch('/api/gallery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:document.getElementById('galleryUrl').value, caption:document.getElementById('galleryCaption').value})}); e.target.reset(); loadGallery(); });
+        window.delGal=async(id)=>{if(confirm('حذف؟')){await fetch(`/api/gallery/${id}`,{method:'DELETE'});loadGallery();}}
+        window.togGal=async(id)=>{await fetch(`/api/gallery/${id}/toggle-home`,{method:'PATCH'});loadGallery();}
+
+        // Reservations
+        async function loadReservations() { const c=document.getElementById('reservations-list'); const l=await(await fetch('/api/reservations')).json(); c.innerHTML=''; l.forEach(i=>{ c.innerHTML+=`<div class="bg-gray-800 p-4 border-r-4 border-yellow-500 rounded relative"><h3 class="font-bold">${i.name}</h3><p>${i.space}</p><p class="text-gray-400 text-sm">${i.date} | ${i.time}</p><button onclick="delRes('${i.id}')" class="absolute top-2 left-2 text-red-500"><i class="fas fa-trash"></i></button></div>`; }); }
+        window.delRes=async(id)=>{if(confirm('حذف؟')){await fetch(`/api/reservations/${id}`,{method:'DELETE'});loadReservations();}}
+
+        // Theme
+        async function loadTheme(){ const t=await(await fetch('/api/theme')).json(); document.getElementById('primaryColorPicker').value=t.primary||'#d4af37'; document.getElementById('primaryColorText').value=t.primary||'#d4af37'; document.getElementById('heroImageInput').value=t.heroImage||''; document.getElementById('menuBgInput').value=t.menuBg||''; document.getElementById('occasionSelect').value=t.occasion||'none'; }
+        document.getElementById('themeForm').addEventListener('submit', async(e)=>{ e.preventDefault(); await fetch('/api/theme',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({primary:document.getElementById('primaryColorText').value, bg:'#0f0f0f', occasion:document.getElementById('occasionSelect').value, heroImage:document.getElementById('heroImageInput').value, menuBg:document.getElementById('menuBgInput').value})}); alert('ذخیره شد'); });
+        const pCP=document.getElementById('primaryColorPicker'), pCT=document.getElementById('primaryColorText');
+        pCP.addEventListener('input',e=>pCT.value=e.target.value); pCT.addEventListener('input',e=>pCP.value=e.target.value);
+
+        // Init
+        loadReservations(); loadCategories(); loadSpaces(); loadGallery(); loadTheme();
     </script>
 </body>
 </html>
