@@ -78,13 +78,14 @@
         <div id="menu-grid" class="flex flex-col gap-6"></div>
     </main>
 
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const categoryContainer = document.getElementById('category-container');
             const menuGrid = document.getElementById('menu-grid');
             let allItems = [];
+            let allCategories = []; // متغیر برای ذخیره دسته‌بندی‌های سرور
 
-            // 1. دریافت تنظیمات تم از سرور
+            // 1. دریافت تنظیمات تم
             try {
                 const res = await fetch('/api/theme');
                 if (res.ok) {
@@ -93,30 +94,64 @@
                 }
             } catch(e) { console.log('Theme loading error'); }
 
-            // 2. دریافت منو از سرور
+            // 2. دریافت اطلاعات اولیه (دسته‌ها و منو)
             try {
-                const res = await fetch('/api/menu');
-                if(!res.ok) throw new Error();
-                allItems = await res.json();
+                // الف) دریافت دسته‌بندی‌ها (برای عکس و اولویت)
+                const catRes = await fetch('/api/categories');
+                if(catRes.ok) allCategories = await catRes.json();
+
+                // ب) دریافت آیتم‌های منو
+                const menuRes = await fetch('/api/menu');
+                if(!menuRes.ok) throw new Error();
+                allItems = await menuRes.json();
+
                 if(allItems.length > 0) { 
-                    renderCategories(allItems); 
+                    renderCategories(allItems, allCategories); // ارسال هر دو لیست به تابع
                     renderItems('همه'); 
                 } else {
                     menuGrid.innerHTML = '<p class="text-center opacity-50 mt-10">منو خالی است.</p>';
                 }
             } catch(e) { 
-                menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت منو</p>'; 
+                menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت اطلاعات</p>'; 
             }
 
             // --- توابع رندرینگ ---
 
-            function renderCategories(items) {
-                const categories = ['همه', ...new Set(items.map(i => i.category))];
+            function renderCategories(items, categoriesDb) {
+                // نام دسته‌هایی که در منو آیتم دارند را پیدا می‌کنیم
+                const activeCatNames = [...new Set(items.map(i => i.category))];
+                
+                // مرتب‌سازی دسته‌ها بر اساس اولویت تنظیم شده در پنل ادمین
+                activeCatNames.sort((a, b) => {
+                    const catA = categoriesDb.find(c => c.name === a);
+                    const catB = categoriesDb.find(c => c.name === b);
+                    // اگر در دیتابیس بود از priority استفاده کن، وگرنه بفرست آخر
+                    const pA = catA ? (catA.priority || 0) : 9999;
+                    const pB = catB ? (catB.priority || 0) : 9999;
+                    return pA - pB;
+                });
+
+                const finalCategories = ['همه', ...activeCatNames];
                 categoryContainer.innerHTML = '';
-                categories.forEach((cat, index) => {
+
+                finalCategories.forEach((catName, index) => {
                     let imgUrl = 'https://via.placeholder.com/150';
-                    if(cat==='همه' && items[0]?.image) imgUrl = items[0].image;
-                    else { const f = items.find(i=>i.category===cat); if(f?.image) imgUrl = f.image; }
+                    
+                    // منطق انتخاب عکس:
+                    if (catName === 'همه') {
+                        // برای "همه"، عکس اولین آیتم را بگذار
+                        if (items[0]?.image) imgUrl = items[0].image;
+                    } else {
+                        // 1. اول تلاش کن عکس را از تنظیمات دسته (پنل ادمین) برداری
+                        const catInDb = categoriesDb.find(c => c.name === catName);
+                        if (catInDb && catInDb.image) {
+                            imgUrl = catInDb.image;
+                        } else {
+                            // 2. اگر نبود، عکس اولین آیتم آن دسته را بردار (حالت قبل)
+                            const firstItem = items.find(i => i.category === catName);
+                            if (firstItem?.image) imgUrl = firstItem.image;
+                        }
+                    }
 
                     const btn = document.createElement('div');
                     btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-white/20 transition-all duration-300`;
@@ -124,13 +159,13 @@
                         <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                         <div class="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div>
                         <div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10">
-                            <span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span>
+                            <span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${catName}</span>
                         </div>`;
                     
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('#category-container > div').forEach(d => d.classList.remove('ring-4', 'ring-brand-green'));
                         btn.classList.add('ring-4', 'ring-brand-green');
-                        renderItems(cat);
+                        renderItems(catName);
                     });
                     
                     if(index===0) btn.classList.add('ring-4', 'ring-brand-green');
@@ -140,7 +175,7 @@
 
             function renderItems(filter) {
                 menuGrid.innerHTML = '';
-                // مرتب‌سازی بر اساس اولویت
+                // فیلتر کردن و سپس مرتب‌سازی آیتم‌ها بر اساس اولویت
                 let filtered = filter === 'همه' ? allItems : allItems.filter(i => i.category === filter);
                 filtered.sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
@@ -153,27 +188,17 @@
                     
                     menuGrid.innerHTML += `
                         <div class="bg-brand-cream rounded-[30px] overflow-hidden shadow-lg animate-up flex flex-col group relative border border-white/50" style="animation-delay: ${delay}ms">
-                            
                             ${item.is_featured ? `<div class="absolute top-4 right-4 bg-white/95 text-black px-3 py-1 rounded-full text-xs font-bold shadow-md z-10 backdrop-blur-sm"><i class="fas fa-star text-yellow-500 mr-1"></i>ویژه</div>` : ''}
-                            
                             <div class="w-full aspect-square relative overflow-hidden">
                                 <img src="${img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${item.name}">
                                 <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/10 to-transparent"></div>
                             </div>
-
                             <div class="p-5 flex flex-col flex-grow text-brand-text relative">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="text-xl font-black">${item.name}</h3>
-                                </div>
-                                
+                                <div class="flex justify-between items-start mb-2"><h3 class="text-xl font-black">${item.name}</h3></div>
                                 <p class="opacity-70 text-sm mb-4 line-clamp-2 leading-6">${item.description || ''}</p>
-                                
                                 <div class="mt-auto flex justify-between items-center pt-4 border-t border-black/5">
                                     <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition shadow-lg active:scale-95 text-sm">سفارش</button>
-                                    <div class="flex flex-col items-end">
-                                        <span class="font-black text-xl dir-ltr text-brand-green">${price}</span>
-                                        <span class="opacity-50 text-[10px]">تومان</span>
-                                    </div>
+                                    <div class="flex flex-col items-end"><span class="font-black text-xl dir-ltr text-brand-green">${price}</span><span class="opacity-50 text-[10px]">تومان</span></div>
                                 </div>
                             </div>
                         </div>`;
@@ -181,7 +206,6 @@
             }
 
             // --- توابع تم و دکوراسیون ---
-
             function applyTheme(theme) {
                 const root = document.documentElement;
                 const occ = theme.occasion || 'none';
@@ -198,8 +222,7 @@
                     setThemeColors('#d42f2f', '#fff0f0', '#333');
                     createFallingEffect('❄️');
                     addDecorations('https://cdn-icons-png.flaticon.com/512/744/744546.png', 'https://cdn-icons-png.flaticon.com/512/3794/3794356.png');
-                } 
-                else if (occ === 'yalda') {
+                } else if (occ === 'yalda') {
                     setThemeColors('#b91c1c', '#2a0a0a', '#ffffff');
                     root.style.setProperty('--page-bg', '#1a0505');
                     const header = document.getElementById('main-header');
@@ -207,14 +230,12 @@
                     header.classList.add('bg-black/80', 'text-white');
                     createFallingEffect('🍉');
                     addDecorations('https://cdn-icons-png.flaticon.com/512/4062/4062916.png', 'https://cdn-icons-png.flaticon.com/512/2224/2224256.png');
-                } 
-                else if (occ === 'valentine') {
+                } else if (occ === 'valentine') {
                     setThemeColors('#db2777', '#fce7f3', '#333');
                     document.getElementById('logo-text').style.color = '#db2777';
                     createFallingEffect('❤️');
                     addDecorations('https://cdn-icons-png.flaticon.com/512/2826/2826720.png', 'https://cdn-icons-png.flaticon.com/512/833/833472.png');
-                } 
-                else if (occ === 'nowruz') {
+                } else if (occ === 'nowruz') {
                     setThemeColors('#10b981', '#ecfdf5', '#333');
                     createFallingEffect('🌸');
                     addDecorations('https://cdn-icons-png.flaticon.com/512/3075/3075932.png', 'https://cdn-icons-png.flaticon.com/512/10609/10609536.png');
@@ -229,14 +250,8 @@
             }
 
             function addDecorations(leftImg, rightImg) {
-                if(leftImg) {
-                    const img = document.createElement('img'); img.src = leftImg; img.className = 'corner-decoration corner-left sway';
-                    document.body.appendChild(img);
-                }
-                if(rightImg) {
-                    const img = document.createElement('img'); img.src = rightImg; img.className = 'corner-decoration corner-right bounce-slow';
-                    document.body.appendChild(img);
-                }
+                if(leftImg) { const img = document.createElement('img'); img.src = leftImg; img.className = 'corner-decoration corner-left sway'; document.body.appendChild(img); }
+                if(rightImg) { const img = document.createElement('img'); img.src = rightImg; img.className = 'corner-decoration corner-right bounce-slow'; document.body.appendChild(img); }
             }
 
             function createFallingEffect(emoji) {
@@ -255,5 +270,6 @@
             }
         });
     </script>
+
 </body>
 </html>
