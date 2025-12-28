@@ -1,35 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <style>
-    /* استایل بارش (برف، قلب و...) */
-    .falling-item { position: fixed; top: -30px; z-index: 9998; pointer-events: none; animation: fall linear infinite; }
-    @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
-    
-    /* استایل دکوراسیون گوشه‌ها (بابانوئل، درخت و...) */
-    .corner-decoration {
-        position: fixed;
-        bottom: 0;
-        z-index: 9999;
-        pointer-events: none;
-        transition: all 0.5s ease-in-out;
-        filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-    }
-    .corner-left { left: 0; width: 180px; transform-origin: bottom left; }
-    .corner-right { right: 0; width: 160px; transform-origin: bottom right; }
-    
-    /* انیمیشن‌های دکوراسیون */
-    .sway { animation: sway 3s infinite ease-in-out alternate; }
-    .bounce-slow { animation: bounceSlow 4s infinite ease-in-out; }
-    
-    @keyframes sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
-    @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-    @media (max-width: 768px) {
-        .corner-decoration { width: 100px !important; } /* سایز کوچکتر در موبایل */
-    }
-    </style>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منوی کافه اسکای مون</title>
@@ -53,15 +24,38 @@
         }
     </script>
     <style>
-        body { background-color: var(--page-bg, #ffffff); color: var(--brand-text-color, #333); transition: background 0.5s; }
+        /* متغیرهای رنگی پایه */
+        :root { --primary-color: #d4af37; --page-bg: #ffffff; --brand-text-color: #333; }
+        
+        body { background-color: var(--page-bg); color: var(--brand-text-color); transition: background 0.5s; }
+        
+        /* پنهان کردن اسکرول بار افقی */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* انیمیشن لود آیتم‌ها */
         .animate-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
         
-        /* افکت‌های مناسبتی */
-        .snowflake, .heart, .flower { position: fixed; top: -20px; z-index: 9999; pointer-events: none; animation-name: fall; animation-timing-function: linear; animation-iteration-count: infinite; }
-        @keyframes fall { to { transform: translateY(105vh); } }
+        /* استایل‌های تم و دکوراسیون */
+        .falling-item { position: fixed; top: -30px; z-index: 9998; pointer-events: none; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+        
+        .corner-decoration {
+            position: fixed; bottom: 0; z-index: 9999; pointer-events: none;
+            transition: all 0.5s ease-in-out; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+        }
+        .corner-left { left: 0; width: 180px; transform-origin: bottom left; }
+        .corner-right { right: 0; width: 160px; transform-origin: bottom right; }
+        .sway { animation: sway 3s infinite ease-in-out alternate; }
+        .bounce-slow { animation: bounceSlow 4s infinite ease-in-out; }
+        
+        @keyframes sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+        @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        @media (max-width: 768px) {
+            .corner-decoration { width: 100px !important; }
+        }
     </style>
 </head>
 <body class="font-sans leading-relaxed pb-20">
@@ -90,210 +84,181 @@
             const menuGrid = document.getElementById('menu-grid');
             let allItems = [];
 
-            // ۱. دریافت تم و اعمال ظاهر
+            // 1. دریافت تنظیمات تم از سرور
             try {
-                const theme = await (await fetch('/api/theme')).json();
-                applyTheme(theme);
-            } catch(e) {}
+                const res = await fetch('/api/theme');
+                if (res.ok) {
+                    const theme = await res.json();
+                    applyTheme(theme);
+                }
+            } catch(e) { console.log('Theme loading error'); }
 
-            // ۲. دریافت منو
+            // 2. دریافت منو از سرور
             try {
                 const res = await fetch('/api/menu');
                 if(!res.ok) throw new Error();
                 allItems = await res.json();
-                if(allItems.length > 0) { renderCategories(allItems); renderItems('همه'); }
-                else menuGrid.innerHTML = '<p class="text-center opacity-50 mt-10">منو خالی است.</p>';
-            } catch(e) { menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت</p>'; }
-
-            // تابع اعمال تم
-            function applyTheme(theme) {
-                const root = document.documentElement;
-                const occ = theme.occasion || 'none';
-
-                // تصویر پس‌زمینه منو (اگر تنظیم شده باشد)
-                if(theme.menuBg) {
-                    document.body.style.backgroundImage = `url('${theme.menuBg}')`;
-                    document.body.style.backgroundSize = 'cover';
-                    document.body.style.backgroundAttachment = 'fixed';
+                if(allItems.length > 0) { 
+                    renderCategories(allItems); 
+                    renderItems('همه'); 
+                } else {
+                    menuGrid.innerHTML = '<p class="text-center opacity-50 mt-10">منو خالی است.</p>';
                 }
-
-                // منطق مناسبت‌ها
-                if (occ === 'christmas') {
-                    root.style.setProperty('--brand-btn-color', '#d42f2f'); // قرمز کریسمس
-                    root.style.setProperty('--brand-bg-color', '#fff0f0'); // زمینه صورتی خیلی کم‌رنگ
-                    createFallingEffect('❄️');
-                } else if (occ === 'yalda') {
-                    root.style.setProperty('--brand-btn-color', '#b91c1c'); // قرمز اناری
-                    root.style.setProperty('--brand-bg-color', '#2a0a0a'); // زمینه تیره یلدا
-                    root.style.setProperty('--brand-text-color', '#ffffff'); // متن سفید
-                    root.style.setProperty('--page-bg', '#1a0505'); 
-                    document.getElementById('main-header').classList.remove('bg-white/95');
-                    document.getElementById('main-header').classList.add('bg-black/80', 'text-white');
-                    createFallingEffect('🍉');
-                } else if (occ === 'valentine') {
-                    root.style.setProperty('--brand-btn-color', '#db2777'); // صورتی جیغ
-                    root.style.setProperty('--brand-bg-color', '#fce7f3'); // زمینه صورتی روشن
-                    document.getElementById('logo-text').style.color = '#db2777';
-                    createFallingEffect('❤️');
-                } else if (occ === 'nowruz') {
-                    root.style.setProperty('--brand-btn-color', '#10b981'); // سبز بهاری
-                    root.style.setProperty('--brand-bg-color', '#ecfdf5'); // سبز خیلی روشن
-                    createFallingEffect('🌸');
-                }
+            } catch(e) { 
+                menuGrid.innerHTML = '<p class="text-center text-red-500 mt-10">خطا در دریافت منو</p>'; 
             }
+
+            // --- توابع رندرینگ ---
 
             function renderCategories(items) {
                 const categories = ['همه', ...new Set(items.map(i => i.category))];
                 categoryContainer.innerHTML = '';
                 categories.forEach((cat, index) => {
                     let imgUrl = 'https://via.placeholder.com/150';
+                    // پیدا کردن عکس برای دسته (یا اولین عکس آیتم‌های آن دسته)
                     if(cat==='همه' && items[0]?.image) imgUrl = items[0].image;
                     else { const f = items.find(i=>i.category===cat); if(f?.image) imgUrl = f.image; }
 
                     const btn = document.createElement('div');
-                    btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-white/20`;
-                    btn.innerHTML = `<img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"><div class="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div><div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10"><span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span></div>`;
+                    btn.className = `min-w-[140px] h-[90px] rounded-2xl relative overflow-hidden cursor-pointer snap-center shadow-md group border border-white/20 transition-all duration-300`;
+                    btn.innerHTML = `
+                        <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div>
+                        <div class="absolute inset-0 flex flex-col justify-center items-center text-white z-10">
+                            <span class="font-bold text-lg shadow-black drop-shadow-md text-center px-1">${cat}</span>
+                        </div>`;
+                    
                     btn.addEventListener('click', () => {
-                        document.querySelectorAll('#category-container > div').forEach(d => d.classList.remove('ring-4', 'ring-white'));
-                        btn.classList.add('ring-4', 'ring-white');
+                        document.querySelectorAll('#category-container > div').forEach(d => d.classList.remove('ring-4', 'ring-brand-green'));
+                        btn.classList.add('ring-4', 'ring-brand-green');
                         renderItems(cat);
                     });
-                    if(index===0) btn.classList.add('ring-4', 'ring-white');
+                    
+                    if(index===0) btn.classList.add('ring-4', 'ring-brand-green');
                     categoryContainer.appendChild(btn);
                 });
             }
 
             function renderItems(filter) {
                 menuGrid.innerHTML = '';
-                const filtered = filter === 'همه' ? allItems : allItems.filter(i => i.category === filter);
-                if(filtered.length === 0) { menuGrid.innerHTML = '<p class="text-center opacity-50 py-10">خالی</p>'; return; }
+                // مرتب‌سازی بر اساس اولویت (priority)
+                let filtered = filter === 'همه' ? allItems : allItems.filter(i => i.category === filter);
+                filtered.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+
+                if(filtered.length === 0) { menuGrid.innerHTML = '<p class="text-center opacity-50 py-10">این دسته‌بندی خالی است.</p>'; return; }
 
                 filtered.forEach((item, index) => {
                     const price = Number(item.price).toLocaleString();
-                    const img = item.image || 'https://via.placeholder.com/300';
-                    const delay = index * 100;
-                    const badge = item.is_featured ? `<div class="absolute top-4 right-4 bg-white/90 text-black px-3 py-1 rounded-full text-xs font-bold shadow-sm z-10">ویژه</div>` : '';
-
+                    const img = item.image || 'https://via.placeholder.com/400';
+                    const delay = index * 50; // تاخیر انیمیشن کمتر برای روانی بیشتر
+                    
+                    // استایل جدید کارت: عکس تمام صفحه و گوشه‌های گرد
                     menuGrid.innerHTML += `
-                        <div class="bg-brand-cream rounded-[35px] p-6 relative shadow-soft animate-up flex flex-col items-center text-center group text-brand-text" style="animation-delay: ${delay}ms">
-                            ${badge}
-                            <div class="w-48 h-48 mb-4 relative drop-shadow-xl transition-transform duration-500 group-hover:scale-105"><img src="${img}" class="w-full h-full object-contain" alt="${item.name}"></div>
-                            <h3 class="text-2xl font-black mb-2">${item.name}</h3>
-                            ${item.description ? `<p class="opacity-70 text-sm mb-6 line-clamp-2 px-2">${item.description}</p>` : '<div class="mb-4"></div>'}
-                            <div class="w-full flex justify-between items-center mt-auto px-2 border-t border-black/5 pt-4">
-                                <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition shadow-lg active:scale-95 text-sm">سفارش</button>
-                                <div class="flex flex-col items-end"><span class="font-black text-xl dir-ltr text-brand-green">${price}</span><span class="opacity-50 text-[10px]">تومان</span></div>
+                        <div class="bg-brand-cream rounded-[30px] overflow-hidden shadow-lg animate-up flex flex-col group relative border border-white/50" style="animation-delay: ${delay}ms">
+                            
+                            ${item.is_featured ? `<div class="absolute top-4 right-4 bg-white/95 text-black px-3 py-1 rounded-full text-xs font-bold shadow-md z-10 backdrop-blur-sm"><i class="fas fa-star text-yellow-500 mr-1"></i>ویژه</div>` : ''}
+                            
+                            <div class="w-full h-64 relative overflow-hidden">
+                                <img src="${img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${item.name}">
+                                <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/10 to-transparent"></div>
+                            </div>
+
+                            <div class="p-5 flex flex-col flex-grow text-brand-text relative">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-xl font-black">${item.name}</h3>
+                                </div>
+                                
+                                <p class="opacity-70 text-sm mb-4 line-clamp-2 leading-6">${item.description || ''}</p>
+                                
+                                <div class="mt-auto flex justify-between items-center pt-4 border-t border-black/5">
+                                    <button class="bg-brand-green text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition shadow-lg active:scale-95 text-sm">سفارش</button>
+                                    <div class="flex flex-col items-end">
+                                        <span class="font-black text-xl dir-ltr text-brand-green">${price}</span>
+                                        <span class="opacity-50 text-[10px]">تومان</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>`;
                 });
             }
 
+            // --- توابع تم و دکوراسیون ---
+
+            function applyTheme(theme) {
+                const root = document.documentElement;
+                const occ = theme.occasion || 'none';
+
+                // تصویر پس‌زمینه منو
+                if(theme.menuBg && theme.menuBg.trim() !== '') {
+                    document.body.style.backgroundImage = `url('${theme.menuBg}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundAttachment = 'fixed';
+                }
+
+                // پاک کردن دکورهای قبلی
+                document.querySelectorAll('.corner-decoration').forEach(el => el.remove());
+
+                // تنظیمات مناسبت‌ها
+                if (occ === 'christmas') {
+                    setThemeColors('#d42f2f', '#fff0f0', '#333');
+                    createFallingEffect('❄️');
+                    addDecorations('https://cdn-icons-png.flaticon.com/512/744/744546.png', 'https://cdn-icons-png.flaticon.com/512/3794/3794356.png');
+                } 
+                else if (occ === 'yalda') {
+                    setThemeColors('#b91c1c', '#2a0a0a', '#ffffff');
+                    root.style.setProperty('--page-bg', '#1a0505');
+                    const header = document.getElementById('main-header');
+                    header.classList.remove('bg-white/95');
+                    header.classList.add('bg-black/80', 'text-white');
+                    createFallingEffect('🍉');
+                    addDecorations('https://cdn-icons-png.flaticon.com/512/4062/4062916.png', 'https://cdn-icons-png.flaticon.com/512/2224/2224256.png');
+                } 
+                else if (occ === 'valentine') {
+                    setThemeColors('#db2777', '#fce7f3', '#333');
+                    document.getElementById('logo-text').style.color = '#db2777';
+                    createFallingEffect('❤️');
+                    addDecorations('https://cdn-icons-png.flaticon.com/512/2826/2826720.png', 'https://cdn-icons-png.flaticon.com/512/833/833472.png');
+                } 
+                else if (occ === 'nowruz') {
+                    setThemeColors('#10b981', '#ecfdf5', '#333');
+                    createFallingEffect('🌸');
+                    addDecorations('https://cdn-icons-png.flaticon.com/512/3075/3075932.png', 'https://cdn-icons-png.flaticon.com/512/10609/10609536.png');
+                }
+            }
+
+            function setThemeColors(btn, bg, text) {
+                const root = document.documentElement;
+                root.style.setProperty('--brand-btn-color', btn);
+                root.style.setProperty('--brand-bg-color', bg);
+                root.style.setProperty('--brand-text-color', text);
+            }
+
+            function addDecorations(leftImg, rightImg) {
+                if(leftImg) {
+                    const img = document.createElement('img'); img.src = leftImg; img.className = 'corner-decoration corner-left sway';
+                    document.body.appendChild(img);
+                }
+                if(rightImg) {
+                    const img = document.createElement('img'); img.src = rightImg; img.className = 'corner-decoration corner-right bounce-slow';
+                    document.body.appendChild(img);
+                }
+            }
+
             function createFallingEffect(emoji) {
+                if(document.querySelector('.falling-item')) return; // جلوگیری از تکرار
                 setInterval(() => {
                     const el = document.createElement('div');
+                    el.className = 'falling-item';
                     el.innerText = emoji;
-                    el.style.cssText = `position:fixed; top:-30px; left:${Math.random()*100}vw; font-size:${Math.random()*20+10}px; animation:fall ${Math.random()*3+3}s linear; z-index:9999; opacity:${Math.random()}; pointer-events:none;`;
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    el.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+                    el.style.opacity = Math.random();
                     document.body.appendChild(el);
-                    setTimeout(()=>el.remove(), 6000);
-                }, 300);
-                const style = document.createElement('style');
-                style.innerHTML = `@keyframes fall { to { transform: translateY(105vh) rotate(${Math.random()*360}deg); } }`;
-                document.head.appendChild(style);
+                    setTimeout(() => el.remove(), 7000);
+                }, 400);
             }
         });
     </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        // --- دریافت و اعمال تم ---
-        try {
-            const res = await fetch('/api/theme');
-            if(res.ok) {
-                const theme = await res.json();
-                applyTheme(theme);
-            }
-        } catch(e) { console.log('Theme default'); }
-
-        function applyTheme(theme) {
-            const root = document.documentElement;
-            const occ = theme.occasion || 'none';
-            
-            // اعمال رنگ اصلی
-            root.style.setProperty('--primary-color', theme.primary);
-            
-            // پاک کردن دکورهای قبلی (اگر باشند)
-            document.querySelectorAll('.corner-decoration').forEach(el => el.remove());
-
-            // --- شرط‌های مناسبت‌ها ---
-            if (occ === 'christmas') {
-                root.style.setProperty('--primary-color', '#d42f2f'); 
-                createFalling('❄️');
-                addDecorations(
-                    'https://cdn-icons-png.flaticon.com/512/744/744546.png', // چپ: بابانوئل
-                    'https://cdn-icons-png.flaticon.com/512/3794/3794356.png' // راست: درخت
-                );
-            } 
-            else if (occ === 'yalda') {
-                root.style.setProperty('--primary-color', '#b91c1c');
-                // اگر هدر دارید رنگش را تیره کن (اختیاری)
-                const header = document.getElementById('main-header');
-                if(header) header.style.backgroundColor = 'rgba(20, 0, 0, 0.9)';
-                
-                createFalling('🍉');
-                addDecorations(
-                    'https://cdn-icons-png.flaticon.com/512/4062/4062916.png', // چپ: انار
-                    'https://cdn-icons-png.flaticon.com/512/2224/2224256.png'  // راست: هندوانه
-                );
-            } 
-            else if (occ === 'valentine') {
-                root.style.setProperty('--primary-color', '#db2777');
-                createFalling('❤️');
-                addDecorations(
-                    'https://cdn-icons-png.flaticon.com/512/2826/2826720.png', // چپ: خرس
-                    'https://cdn-icons-png.flaticon.com/512/833/833472.png'    // راست: بادکنک
-                );
-            } 
-            else if (occ === 'nowruz') {
-                root.style.setProperty('--primary-color', '#10b981');
-                createFalling('🌸');
-                addDecorations(
-                    'https://cdn-icons-png.flaticon.com/512/3075/3075932.png', // چپ: ماهی
-                    'https://cdn-icons-png.flaticon.com/512/10609/10609536.png' // راست: سبزه
-                );
-            }
-        }
-
-        // تابع کمکی برای افزودن عکس‌ها
-        function addDecorations(leftImgSrc, rightImgSrc) {
-            if (leftImgSrc) {
-                const img1 = document.createElement('img');
-                img1.src = leftImgSrc;
-                img1.className = 'corner-decoration corner-left sway';
-                document.body.appendChild(img1);
-            }
-            if (rightImgSrc) {
-                const img2 = document.createElement('img');
-                img2.src = rightImgSrc;
-                img2.className = 'corner-decoration corner-right bounce-slow';
-                document.body.appendChild(img2);
-            }
-        }
-
-        // تابع بارش (برف و...)
-        function createFalling(emoji) {
-            setInterval(() => {
-                const el = document.createElement('div');
-                el.className = 'falling-item';
-                el.innerText = emoji;
-                el.style.left = Math.random() * 100 + 'vw';
-                el.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                el.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
-                el.style.opacity = Math.random();
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 7000);
-            }, 400);
-        }
-    });
-    </script>
-    
 </body>
 </html>
