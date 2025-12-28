@@ -17,38 +17,78 @@ const initDB = async () => {
     try {
         const client = await pool.connect();
         
-        // 1. ساخت جداول اگر وجود ندارند
+        // 1. ساخت جداول
         await client.query(`CREATE TABLE IF NOT EXISTS menu (id SERIAL PRIMARY KEY, name TEXT, category TEXT, price NUMERIC, description TEXT, image TEXT);`);
         await client.query(`CREATE TABLE IF NOT EXISTS gallery (id SERIAL PRIMARY KEY, image TEXT, caption TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
         await client.query(`CREATE TABLE IF NOT EXISTS spaces (id SERIAL PRIMARY KEY, name TEXT, description TEXT, image TEXT);`);
         await client.query(`CREATE TABLE IF NOT EXISTS reservations (id SERIAL PRIMARY KEY, name TEXT, phone TEXT, date TEXT, time TEXT, guests TEXT, space TEXT, occasion TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
         await client.query(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value JSONB);`);
-
-        // 2. تعمیر دیتابیس (اضافه کردن ستون‌های جدید به جداول قدیمی)
         
-        // اضافه کردن ستون ویژه به منو
+        // ✅ جدول جدید برای دسته‌بندی‌ها (لازم برای داشبورد جدید)
+        await client.query(`CREATE TABLE IF NOT EXISTS categories (id SERIAL PRIMARY KEY, name TEXT UNIQUE NOT NULL, image TEXT);`);
+
+        // 2. تعمیر دیتابیس (اضافه کردن ستون‌های گمشده)
         await client.query(`ALTER TABLE menu ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;`);
         
-        // ✅ اضافه کردن ستون ویژه به گالری (حل مشکل ارور شما)
+        // ✅ حل مشکل ارور گالری
         await client.query(`ALTER TABLE gallery ADD COLUMN IF NOT EXISTS is_home_featured BOOLEAN DEFAULT FALSE;`);
 
-        console.log('✅ Database verified and patched successfully');
+        // پر کردن دسته‌بندی‌ها از روی منوی فعلی (اگر جدول خالی باشد)
+        const catCheck = await client.query('SELECT * FROM categories');
+        if (catCheck.rowCount === 0) {
+            const menuCats = await client.query('SELECT DISTINCT category FROM menu');
+            for (let row of menuCats.rows) {
+                if(row.category) await client.query("INSERT INTO categories (name, image) VALUES ($1, $2) ON CONFLICT DO NOTHING", [row.category, 'https://via.placeholder.com/150']);
+            }
+        }
+
+        console.log('✅ Database verified & Updated successfully (V3)'); // پیام جدید برای اطمینان از آپدیت
         client.release();
     } catch (err) {
         console.error('❌ Database Error:', err);
     }
 };
 
-// اجرای تابع دیتابیس در شروع برنامه
 initDB();
 
 
 // ================= API Routes =================
 
+// --- Categories (جدید - برای داشبورد) ---
+app.get('/api/categories', async (req, res) => {
+    const result = await pool.query('SELECT * FROM categories ORDER BY id ASC');
+    res.json(result.rows);
+});
+app.post('/api/categories', async (req, res) => {
+    try {
+        const { name, image } = req.body;
+        const result = await pool.query('INSERT INTO categories (name, image) VALUES ($1, $2) RETURNING *', [name, image]);
+        res.json(result.rows[0]);
+    } catch (e) { res.status(500).json({ error: 'خطا در ثبت دسته' }); }
+});
+app.delete('/api/categories/:id', async (req, res) => {
+    try {
+        const cat = await pool.query('SELECT name FROM categories WHERE id = $1', [req.params.id]);
+        if (cat.rows.length > 0) {
+            await pool.query('DELETE FROM categories WHERE id = $1', [req.params.id]);
+            await pool.query('DELETE FROM menu WHERE category = $1', [cat.rows[0].name]); // حذف آیتم‌های آن دسته
+        }
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // --- Menu ---
 app.get('/api/menu', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM menu ORDER BY is_featured DESC, id ASC');
+        const { category } = req.query;
+        let query = 'SELECT * FROM menu';
+        let params = [];
+        if (category) {
+            query += ' WHERE category = $1';
+            params.push(category);
+        }
+        query += ' ORDER BY is_featured DESC, id ASC';
+        const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -86,7 +126,6 @@ app.delete('/api/menu/:id', async (req, res) => {
 // --- Gallery ---
 app.get('/api/gallery', async (req, res) => {
     try {
-        // دریافت گالری (با اولویت نمایش در خانه)
         const result = await pool.query('SELECT * FROM gallery ORDER BY is_home_featured DESC, created_at DESC');
         res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
@@ -116,68 +155,46 @@ app.delete('/api/gallery/:id', async (req, res) => {
 
 // --- Spaces ---
 app.get('/api/spaces', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM spaces ORDER BY id ASC');
-        res.json(result.rows);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query('SELECT * FROM spaces ORDER BY id ASC');
+    res.json(result.rows);
 });
-
 app.post('/api/spaces', async (req, res) => {
-    try {
-        const { name, description, image } = req.body;
-        const result = await pool.query('INSERT INTO spaces (name, description, image) VALUES ($1, $2, $3) RETURNING *', [name, description, image]);
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { name, description, image } = req.body;
+    const result = await pool.query('INSERT INTO spaces (name, description, image) VALUES ($1, $2, $3) RETURNING *', [name, description, image]);
+    res.json(result.rows[0]);
 });
-
 app.delete('/api/spaces/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM spaces WHERE id = $1', [req.params.id]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query('DELETE FROM spaces WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
 });
 
 // --- Reservations ---
 app.get('/api/reservations', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
-        res.json(result.rows);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
+    res.json(result.rows);
 });
-
 app.post('/api/reservations', async (req, res) => {
-    try {
-        const { name, phone, date, time, guests, space, occasion } = req.body;
-        const result = await pool.query('INSERT INTO reservations (name, phone, date, time, guests, space, occasion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [name, phone, date, time, guests, space, occasion]);
-        res.json(result.rows[0]);
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const { name, phone, date, time, guests, space, occasion } = req.body;
+    const result = await pool.query('INSERT INTO reservations (name, phone, date, time, guests, space, occasion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [name, phone, date, time, guests, space, occasion]);
+    res.json(result.rows[0]);
 });
-
 app.delete('/api/reservations/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
 });
 
 // --- Theme ---
 app.get('/api/theme', async (req, res) => {
-    try {
-        const result = await pool.query("SELECT value FROM settings WHERE key = 'theme'");
-        if (result.rows.length > 0) res.json(result.rows[0].value);
-        else res.json({ primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'theme'");
+    res.json(result.rows.length > 0 ? result.rows[0].value : { primary: '#d4af37', bg: '#0f0f0f', occasion: 'none' });
 });
-
 app.post('/api/theme', async (req, res) => {
-    try {
-        const value = req.body;
-        await pool.query("INSERT INTO settings (key, value) VALUES ('theme', $1) ON CONFLICT (key) DO UPDATE SET value = $1", [value]);
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    const value = req.body;
+    await pool.query("INSERT INTO settings (key, value) VALUES ('theme', $1) ON CONFLICT (key) DO UPDATE SET value = $1", [value]);
+    res.json({ success: true });
 });
 
-// مسیر پیش‌فرض برای تمام درخواست‌های دیگر (SPA)
+// مسیر پیش‌فرض
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
