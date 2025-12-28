@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+    <style>
+    /* استایل بارش (برف، قلب و...) */
+    .falling-item { position: fixed; top: -30px; z-index: 9998; pointer-events: none; animation: fall linear infinite; }
+    @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+    
+    /* استایل دکوراسیون گوشه‌ها (بابانوئل، درخت و...) */
+    .corner-decoration {
+        position: fixed;
+        bottom: 0;
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.5s ease-in-out;
+        filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+    }
+    .corner-left { left: 0; width: 180px; transform-origin: bottom left; }
+    .corner-right { right: 0; width: 160px; transform-origin: bottom right; }
+    
+    /* انیمیشن‌های دکوراسیون */
+    .sway { animation: sway 3s infinite ease-in-out alternate; }
+    .bounce-slow { animation: bounceSlow 4s infinite ease-in-out; }
+    
+    @keyframes sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+    @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    @media (max-width: 768px) {
+        .corner-decoration { width: 100px !important; } /* سایز کوچکتر در موبایل */
+    }
+    </style>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منوی کافه اسکای مون</title>
