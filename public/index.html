@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+    <style>
+    /* استایل بارش (برف، قلب و...) */
+    .falling-item { position: fixed; top: -30px; z-index: 9998; pointer-events: none; animation: fall linear infinite; }
+    @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+    
+    /* استایل دکوراسیون گوشه‌ها (بابانوئل، درخت و...) */
+    .corner-decoration {
+        position: fixed;
+        bottom: 0;
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.5s ease-in-out;
+        filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+    }
+    .corner-left { left: 0; width: 180px; transform-origin: bottom left; }
+    .corner-right { right: 0; width: 160px; transform-origin: bottom right; }
+    
+    /* انیمیشن‌های دکوراسیون */
+    .sway { animation: sway 3s infinite ease-in-out alternate; }
+    .bounce-slow { animation: bounceSlow 4s infinite ease-in-out; }
+    
+    @keyframes sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+    @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    @media (max-width: 768px) {
+        .corner-decoration { width: 100px !important; } /* سایز کوچکتر در موبایل */
+    }
+    </style>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کافه اسکای مون | کیفیت بالا بدون فیلتر</title>
@@ -253,5 +282,98 @@
             } catch(e){}
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // --- دریافت و اعمال تم ---
+        try {
+            const res = await fetch('/api/theme');
+            if(res.ok) {
+                const theme = await res.json();
+                applyTheme(theme);
+            }
+        } catch(e) { console.log('Theme default'); }
+
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            const occ = theme.occasion || 'none';
+            
+            // اعمال رنگ اصلی
+            root.style.setProperty('--primary-color', theme.primary);
+            
+            // پاک کردن دکورهای قبلی (اگر باشند)
+            document.querySelectorAll('.corner-decoration').forEach(el => el.remove());
+
+            // --- شرط‌های مناسبت‌ها ---
+            if (occ === 'christmas') {
+                root.style.setProperty('--primary-color', '#d42f2f'); 
+                createFalling('❄️');
+                addDecorations(
+                    'https://cdn-icons-png.flaticon.com/512/744/744546.png', // چپ: بابانوئل
+                    'https://cdn-icons-png.flaticon.com/512/3794/3794356.png' // راست: درخت
+                );
+            } 
+            else if (occ === 'yalda') {
+                root.style.setProperty('--primary-color', '#b91c1c');
+                // اگر هدر دارید رنگش را تیره کن (اختیاری)
+                const header = document.getElementById('main-header');
+                if(header) header.style.backgroundColor = 'rgba(20, 0, 0, 0.9)';
+                
+                createFalling('🍉');
+                addDecorations(
+                    'https://cdn-icons-png.flaticon.com/512/4062/4062916.png', // چپ: انار
+                    'https://cdn-icons-png.flaticon.com/512/2224/2224256.png'  // راست: هندوانه
+                );
+            } 
+            else if (occ === 'valentine') {
+                root.style.setProperty('--primary-color', '#db2777');
+                createFalling('❤️');
+                addDecorations(
+                    'https://cdn-icons-png.flaticon.com/512/2826/2826720.png', // چپ: خرس
+                    'https://cdn-icons-png.flaticon.com/512/833/833472.png'    // راست: بادکنک
+                );
+            } 
+            else if (occ === 'nowruz') {
+                root.style.setProperty('--primary-color', '#10b981');
+                createFalling('🌸');
+                addDecorations(
+                    'https://cdn-icons-png.flaticon.com/512/3075/3075932.png', // چپ: ماهی
+                    'https://cdn-icons-png.flaticon.com/512/10609/10609536.png' // راست: سبزه
+                );
+            }
+        }
+
+        // تابع کمکی برای افزودن عکس‌ها
+        function addDecorations(leftImgSrc, rightImgSrc) {
+            if (leftImgSrc) {
+                const img1 = document.createElement('img');
+                img1.src = leftImgSrc;
+                img1.className = 'corner-decoration corner-left sway';
+                document.body.appendChild(img1);
+            }
+            if (rightImgSrc) {
+                const img2 = document.createElement('img');
+                img2.src = rightImgSrc;
+                img2.className = 'corner-decoration corner-right bounce-slow';
+                document.body.appendChild(img2);
+            }
+        }
+
+        // تابع بارش (برف و...)
+        function createFalling(emoji) {
+            setInterval(() => {
+                const el = document.createElement('div');
+                el.className = 'falling-item';
+                el.innerText = emoji;
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                el.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+                el.style.opacity = Math.random();
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 7000);
+            }, 400);
+        }
+    });
+    </script>
+    
 </body>
 </html>
