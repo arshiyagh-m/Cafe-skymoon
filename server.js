@@ -14,21 +14,31 @@ const pool = new Pool({ connectionString, ssl: false });
 const initDB = async () => {
     try {
         const client = await pool.connect();
+        
+        // 1. ساخت جداول
         await client.query(`CREATE TABLE IF NOT EXISTS menu (id SERIAL PRIMARY KEY, name TEXT, category TEXT, price NUMERIC, description TEXT, image TEXT);`);
         await client.query(`CREATE TABLE IF NOT EXISTS gallery (id SERIAL PRIMARY KEY, image TEXT, caption TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
         await client.query(`CREATE TABLE IF NOT EXISTS spaces (id SERIAL PRIMARY KEY, name TEXT, description TEXT, image TEXT);`);
         await client.query(`CREATE TABLE IF NOT EXISTS reservations (id SERIAL PRIMARY KEY, name TEXT, phone TEXT, date TEXT, time TEXT, guests TEXT, space TEXT, occasion TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
         await client.query(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value JSONB);`);
         await client.query(`CREATE TABLE IF NOT EXISTS categories (id SERIAL PRIMARY KEY, name TEXT UNIQUE NOT NULL, image TEXT);`);
+
+        // 2. تعمیر دیتابیس (اضافه کردن ستون‌های جدید)
         await client.query(`ALTER TABLE menu ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;`);
         await client.query(`ALTER TABLE gallery ADD COLUMN IF NOT EXISTS is_home_featured BOOLEAN DEFAULT FALSE;`);
         
+        // ✅ اضافه کردن ستون اولویت (Priority) به دسته‌بندی و منو
+        await client.query(`ALTER TABLE categories ADD COLUMN IF NOT EXISTS priority INTEGER DEFAULT 0;`);
+        await client.query(`ALTER TABLE menu ADD COLUMN IF NOT EXISTS priority INTEGER DEFAULT 0;`);
+
+        // پر کردن دسته‌های پیش‌فرض اگر خالی بود
         const catCheck = await client.query('SELECT * FROM categories');
         if (catCheck.rowCount === 0) {
             const menuCats = await client.query('SELECT DISTINCT category FROM menu');
-            for (let row of menuCats.rows) { if(row.category) await client.query("INSERT INTO categories (name, image) VALUES ($1, $2) ON CONFLICT DO NOTHING", [row.category, 'https://via.placeholder.com/150']); }
+            for (let row of menuCats.rows) { if(row.category) await client.query("INSERT INTO categories (name, image, priority) VALUES ($1, $2, 0) ON CONFLICT DO NOTHING", [row.category, 'https://via.placeholder.com/150']); }
         }
-        console.log('✅ Database Ready (V4 - With Edit Cat)');
+
+        console.log('✅ Database Ready (V5 - Priority Added)');
         client.release();
     } catch (err) { console.error('❌ DB Error:', err); }
 };
@@ -36,50 +46,38 @@ initDB();
 
 // ================= API Routes =================
 
-// --- Categories (Updated) ---
+// --- Categories ---
 app.get('/api/categories', async (req, res) => {
-    const result = await pool.query('SELECT * FROM categories ORDER BY id ASC');
+    // مرتب‌سازی بر اساس اولویت (کم به زیاد)
+    const result = await pool.query('SELECT * FROM categories ORDER BY priority ASC, id ASC');
     res.json(result.rows);
 });
 app.post('/api/categories', async (req, res) => {
     try {
-        const { name, image } = req.body;
-        const result = await pool.query('INSERT INTO categories (name, image) VALUES ($1, $2) RETURNING *', [name, image]);
+        const { name, image, priority } = req.body;
+        const result = await pool.query('INSERT INTO categories (name, image, priority) VALUES ($1, $2, $3) RETURNING *', [name, image, priority || 0]);
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: 'خطا در ثبت' }); }
 });
-
-// ✅ روت جدید: ویرایش دسته‌بندی
 app.put('/api/categories/:id', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
         const { id } = req.params;
-        const { name, image } = req.body;
+        const { name, image, priority } = req.body;
 
-        // 1. گرفتن نام قدیمی
         const oldCat = await client.query('SELECT name FROM categories WHERE id = $1', [id]);
-        if(oldCat.rows.length === 0) throw new Error('Category not found');
+        if(oldCat.rows.length === 0) throw new Error('Not found');
         const oldName = oldCat.rows[0].name;
 
-        // 2. آپدیت دسته‌بندی
-        const result = await client.query('UPDATE categories SET name=$1, image=$2 WHERE id=$3 RETURNING *', [name, image, id]);
+        const result = await client.query('UPDATE categories SET name=$1, image=$2, priority=$3 WHERE id=$4 RETURNING *', [name, image, priority || 0, id]);
 
-        // 3. اگر نام عوض شد، تمام آیتم‌های منو را هم آپدیت کن تا گم نشوند
-        if(name !== oldName) {
-            await client.query('UPDATE menu SET category=$1 WHERE category=$2', [name, oldName]);
-        }
+        if(name !== oldName) await client.query('UPDATE menu SET category=$1 WHERE category=$2', [name, oldName]);
 
         await client.query('COMMIT');
         res.json(result.rows[0]);
-    } catch (e) {
-        await client.query('ROLLBACK');
-        res.status(500).json({ error: e.message });
-    } finally {
-        client.release();
-    }
+    } catch (e) { await client.query('ROLLBACK'); res.status(500).json({ error: e.message }); } finally { client.release(); }
 });
-
 app.delete('/api/categories/:id', async (req, res) => {
     try {
         const cat = await pool.query('SELECT name FROM categories WHERE id = $1', [req.params.id]);
@@ -98,22 +96,23 @@ app.get('/api/menu', async (req, res) => {
         let query = 'SELECT * FROM menu';
         let params = [];
         if (category) { query += ' WHERE category = $1'; params.push(category); }
-        query += ' ORDER BY is_featured DESC, id ASC';
+        // مرتب‌سازی: اول اولویت (۱, ۲, ...)، بعد ویژه‌ها، بعد جدیدترین‌ها
+        query += ' ORDER BY priority ASC, is_featured DESC, id ASC';
         const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.post('/api/menu', async (req, res) => {
     try {
-        const { name, category, price, description, image } = req.body;
-        const result = await pool.query('INSERT INTO menu (name, category, price, description, image, is_featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [name, category, price, description, image, false]);
+        const { name, category, price, description, image, priority } = req.body;
+        const result = await pool.query('INSERT INTO menu (name, category, price, description, image, is_featured, priority) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [name, category, price, description, image, false, priority || 0]);
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.put('/api/menu/:id', async (req, res) => {
     try {
-        const { name, category, price, description, image } = req.body;
-        const result = await pool.query('UPDATE menu SET name=$1, category=$2, price=$3, description=$4, image=$5 WHERE id=$6 RETURNING *', [name, category, price, description, image, req.params.id]);
+        const { name, category, price, description, image, priority } = req.body;
+        const result = await pool.query('UPDATE menu SET name=$1, category=$2, price=$3, description=$4, image=$5, priority=$6 WHERE id=$7 RETURNING *', [name, category, price, description, image, priority || 0, req.params.id]);
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -127,7 +126,7 @@ app.delete('/api/menu/:id', async (req, res) => {
     try { await pool.query('DELETE FROM menu WHERE id = $1', [req.params.id]); res.json({ success: true }); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// --- Other ---
+// --- Other (Gallery, Spaces, Reservations, Theme) ---
 app.get('/api/gallery', async (req, res) => { const r = await pool.query('SELECT * FROM gallery ORDER BY is_home_featured DESC, created_at DESC'); res.json(r.rows); });
 app.post('/api/gallery', async (req, res) => { const r = await pool.query('INSERT INTO gallery (image, caption, is_home_featured) VALUES ($1, $2, $3) RETURNING *', [req.body.image, req.body.caption, false]); res.json(r.rows[0]); });
 app.patch('/api/gallery/:id/toggle-home', async (req, res) => { await pool.query('UPDATE gallery SET is_home_featured = NOT is_home_featured WHERE id = $1', [req.params.id]); res.json({success:true}); });
